@@ -1,6 +1,6 @@
 package com.cypress.isupervision.views.masterarbeiten;
 
-import com.cypress.isupervision.data.entity.Masterarbeit;
+import com.cypress.isupervision.data.entity.project.Masterarbeit;
 import com.cypress.isupervision.data.service.MasterarbeitService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;

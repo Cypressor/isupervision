@@ -1,24 +1,18 @@
 package com.cypress.isupervision.data.generator;
 
 import com.cypress.isupervision.data.Role;
-import com.cypress.isupervision.data.entity.Assistent;
-import com.cypress.isupervision.data.entity.Bachelorarbeit;
-import com.cypress.isupervision.data.entity.Masterarbeit;
-import com.cypress.isupervision.data.entity.Projekt;
-import com.cypress.isupervision.data.entity.Student;
-import com.cypress.isupervision.data.entity.User;
-import com.cypress.isupervision.data.service.AssistentRepository;
-import com.cypress.isupervision.data.service.BachelorarbeitRepository;
-import com.cypress.isupervision.data.service.MasterarbeitRepository;
-import com.cypress.isupervision.data.service.ProjektRepository;
-import com.cypress.isupervision.data.service.StudentRepository;
-import com.cypress.isupervision.data.service.UserRepository;
+import com.cypress.isupervision.data.entity.user.Administrator;
+import com.cypress.isupervision.data.entity.user.Assistent;
+import com.cypress.isupervision.data.entity.project.Bachelorarbeit;
+import com.cypress.isupervision.data.entity.project.Masterarbeit;
+import com.cypress.isupervision.data.entity.project.Projekt;
+import com.cypress.isupervision.data.entity.user.Student;
+import com.cypress.isupervision.data.service.*;
 import com.vaadin.exampledata.DataType;
 import com.vaadin.exampledata.ExampleDataGenerator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -32,7 +26,7 @@ public class DataGenerator {
     public CommandLineRunner loadData(PasswordEncoder passwordEncoder, UserRepository userRepository,
             ProjektRepository projektRepository, BachelorarbeitRepository bachelorarbeitRepository,
             MasterarbeitRepository masterarbeitRepository, StudentRepository studentRepository,
-            AssistentRepository assistentRepository) {
+            AssistentRepository assistentRepository, AdministratorRepository administratorRepository) {
         return args -> {
             Logger logger = LoggerFactory.getLogger(getClass());
             if (userRepository.count() != 0L) {
@@ -55,7 +49,7 @@ public class DataGenerator {
             student.setProfilePictureUrl(
                     "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
             student.setRoles(Collections.singleton(Role.STUDENT));
-            userRepository.save(student);
+            studentRepository.save(student);
 
             Assistent assistent = new Assistent();
             assistent.setVorname("assi");
@@ -70,17 +64,19 @@ public class DataGenerator {
             assistent.setProfilePictureUrl(
                     "https://t3.ftcdn.net/jpg/02/05/76/62/240_F_205766203_bGiVmoVpbipIAAM3CWL84FWbROgSIcik.jpg");
             student.setRoles(Collections.singleton(Role.ASSISTENT));
-            userRepository.save(assistent);
+            assistentRepository.save(assistent);
 
-            User admin = new User();
-            admin.setVorname("Emma");
-            admin.setNachname("Powerful");
+            Administrator admin = new Administrator();
+            admin.setVorname("ad");
+            admin.setNachname("min");
             admin.setUsername("admin");
             admin.setHashedPassword(passwordEncoder.encode("admin"));
             admin.setProfilePictureUrl(
                     "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
-            admin.setRoles(Set.of(Role.STUDENT, Role.ASSISTENT, Role.ADMIN));
-            userRepository.save(admin);
+            //admin.setRoles(Set.of(Role.STUDENT, Role.ASSISTENT, Role.ADMIN));
+            administratorRepository.save(admin);
+
+
             logger.info("... generating 100 Projekt entities...");
             ExampleDataGenerator<Projekt> projektRepositoryGenerator = new ExampleDataGenerator<>(Projekt.class,
                     LocalDateTime.of(2022, 5, 24, 0, 0, 0));

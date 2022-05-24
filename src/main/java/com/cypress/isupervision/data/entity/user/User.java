@@ -1,6 +1,7 @@
-package com.cypress.isupervision.data.entity;
+package com.cypress.isupervision.data.entity.user;
 
 import com.cypress.isupervision.data.Role;
+import com.cypress.isupervision.data.entity.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
 import javax.persistence.ElementCollection;
@@ -13,8 +14,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "application_user")
-public class User extends AbstractEntity {
-
+public class User extends AbstractEntity
+{
     private String username;
     private String vorname;
     private String nachname;
@@ -27,6 +28,11 @@ public class User extends AbstractEntity {
     private Set<Role> roles;
     @Lob
     private String profilePictureUrl;
+
+    public User()
+    {
+        this.setProfilePictureUrl("https://www.seekpng.com/png/detail/847-8474751_download-empty-profile.png");
+    }
 
     public String getEmail() {
         return email;

@@ -1,15 +1,28 @@
-package com.cypress.isupervision.data.entity;
+package com.cypress.isupervision.data.entity.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.cypress.isupervision.data.Role;
 import javax.persistence.Entity;
+import java.util.Set;
 
 @Entity
-public class Assistent extends User {
+public class Administrator extends User {
 
+    private Integer level;
     private Integer projLimit;
     private Integer baLimit;
     private Integer maLimit;
 
+    public Administrator()
+    {
+        this.setRoles(Set.of(Role.STUDENT, Role.ASSISTENT, Role.ADMIN));
+        this.level=3;
+        this.projLimit=1000;
+        this.baLimit=1000;
+        this.maLimit=1000;
+    }
+
+    public Integer getLevel() { return level; }
+    public void setLevel(Integer level) { this.level = level; }
     public Integer getProjLimit() {
         return projLimit;
     }

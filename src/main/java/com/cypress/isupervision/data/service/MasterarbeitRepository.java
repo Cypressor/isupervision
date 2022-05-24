@@ -1,6 +1,6 @@
 package com.cypress.isupervision.data.service;
 
-import com.cypress.isupervision.data.entity.Masterarbeit;
+import com.cypress.isupervision.data.entity.project.Masterarbeit;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 

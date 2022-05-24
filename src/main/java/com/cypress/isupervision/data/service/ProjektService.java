@@ -1,6 +1,6 @@
 package com.cypress.isupervision.data.service;
 
-import com.cypress.isupervision.data.entity.Projekt;
+import com.cypress.isupervision.data.entity.project.Projekt;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;

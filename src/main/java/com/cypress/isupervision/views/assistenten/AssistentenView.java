@@ -1,6 +1,6 @@
 package com.cypress.isupervision.views.assistenten;
 
-import com.cypress.isupervision.data.entity.Assistent;
+import com.cypress.isupervision.data.entity.user.Assistent;
 import com.cypress.isupervision.data.service.AssistentService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;

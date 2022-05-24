@@ -1,6 +1,6 @@
 package com.cypress.isupervision.security;
 
-import com.cypress.isupervision.data.entity.User;
+import com.cypress.isupervision.data.entity.user.User;
 import com.cypress.isupervision.data.service.UserRepository;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;

@@ -1,6 +1,6 @@
 package com.cypress.isupervision.views.studenten;
 
-import com.cypress.isupervision.data.entity.Student;
+import com.cypress.isupervision.data.entity.user.Student;
 import com.cypress.isupervision.data.service.StudentService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;

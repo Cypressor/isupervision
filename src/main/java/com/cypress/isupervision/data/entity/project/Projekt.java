@@ -1,16 +1,18 @@
-package com.cypress.isupervision.data.entity;
+package com.cypress.isupervision.data.entity.project;
+
+import com.cypress.isupervision.data.entity.AbstractEntity;
 
 import java.time.LocalDate;
 import javax.persistence.Entity;
 
 @Entity
-public class Masterarbeit extends AbstractEntity {
+public class Projekt extends AbstractEntity
+{
 
     private String titel;
-    private String assistent;
+    private String assistant;
     private String student;
     private LocalDate deadline;
-    private LocalDate pruefungstermin;
 
     public String getTitel() {
         return titel;
@@ -18,11 +20,11 @@ public class Masterarbeit extends AbstractEntity {
     public void setTitel(String titel) {
         this.titel = titel;
     }
-    public String getAssistent() {
-        return assistent;
+    public String getAssistant() {
+        return assistant;
     }
-    public void setAssistent(String assistent) {
-        this.assistent = assistent;
+    public void setAssistant(String assistant) {
+        this.assistant = assistant;
     }
     public String getStudent() {
         return student;
@@ -35,12 +37,6 @@ public class Masterarbeit extends AbstractEntity {
     }
     public void setDeadline(LocalDate deadline) {
         this.deadline = deadline;
-    }
-    public LocalDate getPruefungstermin() {
-        return pruefungstermin;
-    }
-    public void setPruefungstermin(LocalDate pruefungstermin) {
-        this.pruefungstermin = pruefungstermin;
     }
 
 }

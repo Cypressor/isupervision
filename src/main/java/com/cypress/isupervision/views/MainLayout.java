@@ -1,6 +1,6 @@
 package com.cypress.isupervision.views;
 
-import com.cypress.isupervision.data.entity.User;
+import com.cypress.isupervision.data.entity.user.User;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.account.AccountView;
 import com.cypress.isupervision.views.assistenten.AssistentenView;

@@ -1,6 +1,6 @@
 package com.cypress.isupervision.views.bachelorarbeiten;
 
-import com.cypress.isupervision.data.entity.Bachelorarbeit;
+import com.cypress.isupervision.data.entity.project.Bachelorarbeit;
 import com.cypress.isupervision.data.service.BachelorarbeitService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;

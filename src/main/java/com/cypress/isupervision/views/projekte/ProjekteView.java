@@ -1,6 +1,6 @@
 package com.cypress.isupervision.views.projekte;
 
-import com.cypress.isupervision.data.entity.Projekt;
+import com.cypress.isupervision.data.entity.project.Projekt;
 import com.cypress.isupervision.data.service.ProjektService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
