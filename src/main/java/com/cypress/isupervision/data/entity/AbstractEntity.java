@@ -4,6 +4,8 @@ import java.util.UUID;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PostPersist;
+
 import org.hibernate.annotations.Type;
 
 @MappedSuperclass
@@ -41,5 +43,11 @@ public abstract class AbstractEntity {
             return id.equals(other.id);
         }
         return super.equals(other);
+    }
+
+    @PostPersist
+    public void postPersist()
+    {
+
     }
 }

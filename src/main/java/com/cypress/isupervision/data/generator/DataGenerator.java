@@ -43,22 +43,43 @@ public class DataGenerator {
 
             logger.info("Generating demo data");
 
-            logger.info("... generating 2 User entities...");
-            User user = new User();
-            user.setName("John Normal");
-            user.setUsername("user");
-            user.setHashedPassword(passwordEncoder.encode("user"));
-            user.setProfilePictureUrl(
+            logger.info("... generating 3 User entities...");
+            Student student = new Student();
+            student.setVorname("stu");
+            student.setNachname("dent");
+            student.setUsername("student");
+            student.setEmail("student@edu.at");
+            student.setLevel(0);
+            student.setPasswort("student");
+            student.setHashedPassword(passwordEncoder.encode("student"));
+            student.setProfilePictureUrl(
                     "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
-            user.setRoles(Collections.singleton(Role.USER));
-            userRepository.save(user);
+            student.setRoles(Collections.singleton(Role.STUDENT));
+            userRepository.save(student);
+
+            Assistent assistent = new Assistent();
+            assistent.setVorname("assi");
+            assistent.setNachname("stent");
+            assistent.setUsername("assistent");
+            assistent.setEmail("assistent@edu.at");
+            assistent.setProjLimit(20);
+            assistent.setBaLimit(10);
+            assistent.setMaLimit(5);
+            assistent.setPasswort("assistent");
+            assistent.setHashedPassword(passwordEncoder.encode("assistent"));
+            assistent.setProfilePictureUrl(
+                    "https://t3.ftcdn.net/jpg/02/05/76/62/240_F_205766203_bGiVmoVpbipIAAM3CWL84FWbROgSIcik.jpg");
+            student.setRoles(Collections.singleton(Role.ASSISTENT));
+            userRepository.save(assistent);
+
             User admin = new User();
-            admin.setName("Emma Powerful");
+            admin.setVorname("Emma");
+            admin.setNachname("Powerful");
             admin.setUsername("admin");
             admin.setHashedPassword(passwordEncoder.encode("admin"));
             admin.setProfilePictureUrl(
                     "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
-            admin.setRoles(Set.of(Role.USER, Role.ADMIN));
+            admin.setRoles(Set.of(Role.STUDENT, Role.ASSISTENT, Role.ADMIN));
             userRepository.save(admin);
             logger.info("... generating 100 Projekt entities...");
             ExampleDataGenerator<Projekt> projektRepositoryGenerator = new ExampleDataGenerator<>(Projekt.class,

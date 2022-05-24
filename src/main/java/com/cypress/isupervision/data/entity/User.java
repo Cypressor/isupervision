@@ -16,7 +16,10 @@ import javax.persistence.Table;
 public class User extends AbstractEntity {
 
     private String username;
-    private String name;
+    private String vorname;
+    private String nachname;
+    private String email;
+    private String passwort;
     @JsonIgnore
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
@@ -25,17 +28,27 @@ public class User extends AbstractEntity {
     @Lob
     private String profilePictureUrl;
 
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getPasswort() {
+        return passwort;
+    }
+    public void setPasswort(String passwort) {
+        this.passwort = passwort;
+    }
+    public String getVorname() {return vorname; }
+    public void setVorname(String vorname) { this.vorname = vorname;}
+    public String getNachname() {return nachname; }
+    public void setNachname(String nachname) { this.nachname = nachname;}
     public String getUsername() {
         return username;
     }
     public void setUsername(String username) {
         this.username = username;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
     public String getHashedPassword() {
         return hashedPassword;

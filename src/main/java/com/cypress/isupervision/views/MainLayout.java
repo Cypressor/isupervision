@@ -3,7 +3,6 @@ package com.cypress.isupervision.views;
 import com.cypress.isupervision.data.entity.User;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.account.AccountView;
-import com.cypress.isupervision.views.administratoren.AdministratorenView;
 import com.cypress.isupervision.views.assistenten.AssistentenView;
 import com.cypress.isupervision.views.bachelorarbeiten.BachelorarbeitenView;
 import com.cypress.isupervision.views.masterarbeiten.MasterarbeitenView;
@@ -101,7 +100,7 @@ public class MainLayout extends AppLayout {
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
 
-            Avatar avatar = new Avatar(user.getName(), user.getProfilePictureUrl());
+            Avatar avatar = new Avatar(user.getVorname()+" "+user.getNachname(), user.getProfilePictureUrl());
             avatar.addClassNames("me-xs");
 
             ContextMenu userMenu = new ContextMenu(avatar);
@@ -110,7 +109,7 @@ public class MainLayout extends AppLayout {
                 authenticatedUser.logout();
             });
 
-            Span name = new Span(user.getName());
+            Span name = new Span(user.getVorname()+" "+user.getNachname());
             name.addClassNames("font-medium", "text-s", "text-secondary");
 
             layout.add(avatar, name);
@@ -151,8 +150,6 @@ public class MainLayout extends AppLayout {
                 new MenuItemInfo("Studenten", "", StudentenView.class), //
 
                 new MenuItemInfo("Assistenten", "", AssistentenView.class), //
-
-                new MenuItemInfo("Administratoren", "", AdministratorenView.class), //
 
                 new MenuItemInfo("Account", "", AccountView.class), //
 
