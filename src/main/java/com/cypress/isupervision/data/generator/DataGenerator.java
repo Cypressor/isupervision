@@ -7,6 +7,7 @@ import com.cypress.isupervision.data.entity.project.Bachelorarbeit;
 import com.cypress.isupervision.data.entity.project.Masterarbeit;
 import com.cypress.isupervision.data.entity.project.Projekt;
 import com.cypress.isupervision.data.entity.user.Student;
+import com.cypress.isupervision.data.entity.user.User;
 import com.cypress.isupervision.data.service.*;
 import com.vaadin.exampledata.DataType;
 import com.vaadin.exampledata.ExampleDataGenerator;
@@ -66,14 +67,13 @@ public class DataGenerator {
             student.setRoles(Collections.singleton(Role.ASSISTENT));
             assistentRepository.save(assistent);
 
-            Administrator admin = new Administrator();
+           Administrator admin = new Administrator();
             admin.setVorname("ad");
             admin.setNachname("min");
             admin.setUsername("admin");
             admin.setHashedPassword(passwordEncoder.encode("admin"));
             admin.setProfilePictureUrl(
                     "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
-            //admin.setRoles(Set.of(Role.STUDENT, Role.ASSISTENT, Role.ADMIN));
             administratorRepository.save(admin);
 
 
@@ -108,6 +108,7 @@ public class DataGenerator {
             logger.info("... generating 100 Student entities...");
             ExampleDataGenerator<Student> studentRepositoryGenerator = new ExampleDataGenerator<>(Student.class,
                     LocalDateTime.of(2022, 5, 24, 0, 0, 0));
+            studentRepositoryGenerator.setData(Student::setUsername, DataType.FIRST_NAME);
             studentRepositoryGenerator.setData(Student::setVorname, DataType.FIRST_NAME);
             studentRepositoryGenerator.setData(Student::setNachname, DataType.LAST_NAME);
             studentRepositoryGenerator.setData(Student::setEmail, DataType.EMAIL);

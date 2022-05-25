@@ -1,7 +1,11 @@
 package com.cypress.isupervision.views.studenten;
 
 import com.cypress.isupervision.data.entity.user.Student;
+import com.cypress.isupervision.data.entity.user.User;
+import com.cypress.isupervision.data.service.StudentRepository;
 import com.cypress.isupervision.data.service.StudentService;
+import com.cypress.isupervision.data.service.UserRepository;
+import com.cypress.isupervision.data.service.UserService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -12,7 +16,9 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -26,8 +32,13 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
+import javax.swing.*;
+
+import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mapping.model.Property;
+
 
 @PageTitle("Studenten")
 @Route(value = "studenten/:studentID?/:action?(edit)", layout = MainLayout.class)
@@ -39,6 +50,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
     private Grid<Student> grid = new Grid<>(Student.class, false);
 
+    private TextField username;
     private TextField vorname;
     private TextField nachname;
     private TextField email;
@@ -47,16 +59,21 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
+    private Button delete = new Button("Delete");
+    private Button edit = new Button("Edit");
 
     private BeanValidationBinder<Student> binder;
 
     private Student student;
 
     private final StudentService studentService;
+    private StudentRepository studentRepository;
 
     @Autowired
-    public StudentenView(StudentService studentService) {
+    public StudentenView(StudentService studentService, UserService userService) {
+
         this.studentService = studentService;
+
         addClassNames("studenten-view");
 
         // Create UI
@@ -68,6 +85,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
+        grid.addColumn("username").setAutoWidth(true);
         grid.addColumn("vorname").setAutoWidth(true);
         grid.addColumn("nachname").setAutoWidth(true);
         grid.addColumn("email").setAutoWidth(true);
@@ -103,20 +121,72 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.student == null) {
+            //    if (this.student == null) {
                     this.student = new Student();
-                }
+            //    }
                 binder.writeBean(this.student);
 
-                studentService.update(this.student);
-                clearForm();
-                refreshGrid();
-                Notification.show("Student details stored.");
+                if(username.getValue().trim()=="" || vorname.getValue().trim()=="" || nachname.getValue().trim()=="" || email.getValue().trim()=="" || passwort.getValue().trim()=="" || level.getValue().trim()=="")
+                {
+                    Notification.show("Bitte alle Felder ausfüllen.");
+                }
+                else
+                {
+                    int exists = userService.exists(this.student);
+                    if (exists == 0 || exists == 1)
+                    {
+                        studentService.update(this.student);
+                        clearForm();
+                        refreshGrid();
+                        Notification.show("Neuer Student wurde angelegt.");
+                    }
+                   if (exists == 1 || exists == 3)
+                    {
+                        Notification.show("Username existiert bereits.");
+                    }
+                    if (exists == 2 || exists == 3)
+                    {
+                        Notification.show("Email existiert bereits");
+                    }
+                }
                 UI.getCurrent().navigate(StudentenView.class);
             } catch (ValidationException validationException) {
-                Notification.show("An exception happened while trying to store the student details.");
+                Notification.show("Es ist leider etwas schief gegangen.");
             }
         });
+
+        delete.addClickListener(e -> {
+            binder.readBean(this.student);
+            studentService.delete(this.student.getId());
+            refreshGrid();
+        });
+
+        edit.addClickListener(e-> {
+            try
+            {
+                if (this.student != null)
+                {
+                    binder.writeBean(this.student);
+                    if(username.getValue().trim()=="" || vorname.getValue().trim()=="" || nachname.getValue().trim()=="" || email.getValue().trim()=="" || passwort.getValue().trim()=="" || level.getValue().trim()=="")
+                    {
+                        Notification.show("Bitte alle Felder ausfüllen.");
+                    }
+                    else
+                    {
+                            studentService.update(this.student);
+                            clearForm();
+                            refreshGrid();
+                            Notification.show("Neuer Student wurde angelegt.");
+                    }
+               }
+
+
+
+
+            UI.getCurrent().navigate(StudentenView.class);
+        } catch (ValidationException validationException) {
+            Notification.show("Es ist leider etwas schief gegangen.");
+        }});
 
     }
 
@@ -147,12 +217,13 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
+        username = new TextField("Username");
         vorname = new TextField("Vorname");
         nachname = new TextField("Nachname");
         email = new TextField("Email");
         passwort = new TextField("Passwort");
         level = new TextField("Level");
-        Component[] fields = new Component[]{vorname, nachname, email, passwort, level};
+        Component[] fields = new Component[]{username, vorname, nachname, email, passwort, level};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -162,12 +233,22 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     }
 
     private void createButtonLayout(Div editorLayoutDiv) {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setClassName("button-layout");
+        VerticalLayout buttonLayout1 = new VerticalLayout();
+        VerticalLayout buttonLayout2 = new VerticalLayout();
+        buttonLayout1.setClassName("button-layout1");
+        buttonLayout2.setClassName("button-layout2");
+        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        edit.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(save, cancel);
-        editorLayoutDiv.add(buttonLayout);
+        buttonLayout1.add(save, cancel );
+        buttonLayout2.add(edit,delete);
+        HorizontalLayout greaterButtonLayout= new HorizontalLayout();
+        buttonLayout2.setAlignItems(FlexComponent.Alignment.STRETCH);
+        buttonLayout1.setAlignItems(FlexComponent.Alignment.STRETCH);
+        greaterButtonLayout.add(buttonLayout1,buttonLayout2);
+        greaterButtonLayout.setVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        editorLayoutDiv.add(greaterButtonLayout);
     }
 
     private void createGridLayout(SplitLayout splitLayout) {
@@ -189,6 +270,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private void populateForm(Student value) {
         this.student = value;
         binder.readBean(this.student);
-
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.cypress.isupervision.data.service;
 
+import com.cypress.isupervision.data.entity.user.Student;
 import com.cypress.isupervision.data.entity.user.User;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +37,24 @@ public class UserService {
 
     public int count() {
         return (int) repository.count();
+    }
+
+    public int exists(User user)
+    {
+        int exists=0;
+
+        User tempUser = repository.findByUsername(user.getUsername());
+        if (tempUser != null)
+        {
+            exists+=1;
+        }
+        tempUser = repository.findByEmail(user.getEmail());
+        if (tempUser!=null)
+        {
+            exists+=2;
+        }
+
+        return exists;
     }
 
 }

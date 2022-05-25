@@ -11,7 +11,7 @@ import javax.annotation.security.PermitAll;
 
 @PageTitle("Registrierung")
 @Route(value = "registrierung", layout = MainLayout.class)
-@PermitAll
+
 public class RegistrierungView extends VerticalLayout {
 
     public RegistrierungView() {

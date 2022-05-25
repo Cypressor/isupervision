@@ -4,18 +4,13 @@ import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.entity.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "application_user")
+@Table(name = "application_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"username","email"})})
 public class User extends AbstractEntity
 {
+
     private String username;
     private String vorname;
     private String nachname;
