@@ -1,7 +1,7 @@
 package com.cypress.isupervision.views.masterarbeiten;
 
-import com.cypress.isupervision.data.entity.project.Masterarbeit;
-import com.cypress.isupervision.data.service.MasterarbeitService;
+import com.cypress.isupervision.data.entity.project.MastersThesis;
+import com.cypress.isupervision.data.service.MastersThesisService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -30,33 +30,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 @PageTitle("Masterarbeiten")
-@Route(value = "masterarbeiten/:masterarbeitID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "mastersthesis/:mastersthesisID?/:action?(edit)", layout = MainLayout.class)
 @PermitAll
 public class MasterarbeitenView extends Div implements BeforeEnterObserver {
 
-    private final String MASTERARBEIT_ID = "masterarbeitID";
-    private final String MASTERARBEIT_EDIT_ROUTE_TEMPLATE = "masterarbeiten/%s/edit";
+    private final String MASTERSTHESIS_ID = "mastersthesisID";
+    private final String MASTERSTHESIS_EDIT_ROUTE_TEMPLATE = "mastersthesis/%s/edit";
 
-    private Grid<Masterarbeit> grid = new Grid<>(Masterarbeit.class, false);
+    private Grid<MastersThesis> grid = new Grid<>(MastersThesis.class, false);
 
-    private TextField titel;
-    private TextField assistent;
+    private TextField title;
+    private TextField assistant;
     private TextField student;
     private DatePicker deadline;
-    private DatePicker pruefungstermin;
+    private DatePicker examDate;
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private BeanValidationBinder<Masterarbeit> binder;
+    private BeanValidationBinder<MastersThesis> binder;
 
-    private Masterarbeit masterarbeit;
+    private MastersThesis mastersThesis;
 
-    private final MasterarbeitService masterarbeitService;
+    private final MastersThesisService mastersThesisService;
 
     @Autowired
-    public MasterarbeitenView(MasterarbeitService masterarbeitService) {
-        this.masterarbeitService = masterarbeitService;
+    public MasterarbeitenView(MastersThesisService mastersThesisService) {
+        this.mastersThesisService = mastersThesisService;
         addClassNames("masterarbeiten-view");
 
         // Create UI
@@ -68,12 +68,20 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("titel").setAutoWidth(true);
-        grid.addColumn("assistent").setAutoWidth(true);
+
+        grid.addColumn("title").setAutoWidth(true);
+        grid.addColumn("assistant").setAutoWidth(true);
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
-        grid.addColumn("pruefungstermin").setAutoWidth(true);
-        grid.setItems(query -> masterarbeitService.list(
+        grid.addColumn("examDate").setAutoWidth(true);
+
+        grid.getColumnByKey("title").setHeader("Titel");
+        grid.getColumnByKey("assistant").setHeader("Assistent");
+        grid.getColumnByKey("student").setHeader("Student");
+        grid.getColumnByKey("deadline").setHeader("Deadline");
+        grid.getColumnByKey("examDate").setHeader("Prüfungstermin");
+
+        grid.setItems(query -> mastersThesisService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -81,7 +89,7 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(MASTERARBEIT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(String.format(MASTERSTHESIS_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
             } else {
                 clearForm();
                 UI.getCurrent().navigate(MasterarbeitenView.class);
@@ -89,7 +97,7 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
         });
 
         // Configure Form
-        binder = new BeanValidationBinder<>(Masterarbeit.class);
+        binder = new BeanValidationBinder<>(MastersThesis.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
 
@@ -102,12 +110,12 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.masterarbeit == null) {
-                    this.masterarbeit = new Masterarbeit();
+                if (this.mastersThesis == null) {
+                    this.mastersThesis = new MastersThesis();
                 }
-                binder.writeBean(this.masterarbeit);
+                binder.writeBean(this.mastersThesis);
 
-                masterarbeitService.update(this.masterarbeit);
+                mastersThesisService.update(this.mastersThesis);
                 clearForm();
                 refreshGrid();
                 Notification.show("Masterarbeit details stored.");
@@ -121,11 +129,11 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Optional<UUID> masterarbeitId = event.getRouteParameters().get(MASTERARBEIT_ID).map(UUID::fromString);
+        Optional<UUID> masterarbeitId = event.getRouteParameters().get(MASTERSTHESIS_ID).map(UUID::fromString);
         if (masterarbeitId.isPresent()) {
-            Optional<Masterarbeit> masterarbeitFromBackend = masterarbeitService.get(masterarbeitId.get());
-            if (masterarbeitFromBackend.isPresent()) {
-                populateForm(masterarbeitFromBackend.get());
+            Optional<MastersThesis> mastersThesisFromBackend = mastersThesisService.get(masterarbeitId.get());
+            if (mastersThesisFromBackend.isPresent()) {
+                populateForm(mastersThesisFromBackend.get());
             } else {
                 Notification.show(
                         String.format("The requested masterarbeit was not found, ID = %s", masterarbeitId.get()), 3000,
@@ -147,12 +155,12 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        titel = new TextField("Titel");
-        assistent = new TextField("Assistent");
+        title = new TextField("Titel");
+        assistant = new TextField("Assistent");
         student = new TextField("Student");
         deadline = new DatePicker("Deadline");
-        pruefungstermin = new DatePicker("Pruefungstermin");
-        Component[] fields = new Component[]{titel, assistent, student, deadline, pruefungstermin};
+        examDate = new DatePicker("Pruefungstermin");
+        Component[] fields = new Component[]{title, assistant, student, deadline, examDate};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -186,9 +194,9 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(Masterarbeit value) {
-        this.masterarbeit = value;
-        binder.readBean(this.masterarbeit);
+    private void populateForm(MastersThesis value) {
+        this.mastersThesis = value;
+        binder.readBean(this.mastersThesis);
 
     }
 }

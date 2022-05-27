@@ -38,23 +38,24 @@ import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mapping.model.Property;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @PageTitle("Studenten")
-@Route(value = "studenten/:studentID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "students/:studentID?/:action?(edit)", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 public class StudentenView extends Div implements BeforeEnterObserver {
 
     private final String STUDENT_ID = "studentID";
-    private final String STUDENT_EDIT_ROUTE_TEMPLATE = "studenten/%s/edit";
+    private final String STUDENT_EDIT_ROUTE_TEMPLATE = "students/%s/edit";
 
     private Grid<Student> grid = new Grid<>(Student.class, false);
 
     private TextField username;
-    private TextField vorname;
-    private TextField nachname;
+    private TextField firstname;
+    private TextField lastname;
     private TextField email;
-    private TextField passwort;
+    private TextField password;
     private TextField level;
 
     private Button cancel = new Button("Cancel");
@@ -67,10 +68,10 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private Student student;
 
     private final StudentService studentService;
-    private StudentRepository studentRepository;
+
 
     @Autowired
-    public StudentenView(StudentService studentService, UserService userService) {
+    public StudentenView(StudentService studentService, UserService userService, PasswordEncoder passwordEncoder) {
 
         this.studentService = studentService;
 
@@ -86,11 +87,19 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
         // Configure Grid
         grid.addColumn("username").setAutoWidth(true);
-        grid.addColumn("vorname").setAutoWidth(true);
-        grid.addColumn("nachname").setAutoWidth(true);
+        grid.addColumn("firstname").setAutoWidth(true);
+        grid.addColumn("lastname").setAutoWidth(true);
         grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("passwort").setAutoWidth(true);
+        grid.addColumn("password").setAutoWidth(true);
         grid.addColumn("level").setAutoWidth(true);
+
+        grid.getColumnByKey("username").setHeader("Benutzername");
+        grid.getColumnByKey("firstname").setHeader("Vorname");
+        grid.getColumnByKey("lastname").setHeader("Nachname");
+        grid.getColumnByKey("email").setHeader("Email");
+        grid.getColumnByKey("password").setHeader("Passwort");
+        grid.getColumnByKey("level").setHeader("Level");
+
         grid.setItems(query -> studentService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
@@ -126,7 +135,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
             //    }
                 binder.writeBean(this.student);
 
-                if(username.getValue().trim()=="" || vorname.getValue().trim()=="" || nachname.getValue().trim()=="" || email.getValue().trim()=="" || passwort.getValue().trim()=="" || level.getValue().trim()=="")
+                if(username.getValue().trim()=="" || firstname.getValue().trim()=="" || lastname.getValue().trim()=="" || email.getValue().trim()=="" || password.getValue().trim()=="" || level.getValue().trim()=="")
                 {
                     Notification.show("Bitte alle Felder ausfüllen.");
                 }
@@ -135,6 +144,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                     int exists = userService.exists(this.student);
                     if (exists == 0 || exists == 1)
                     {
+                        this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
                         studentService.update(this.student);
                         clearForm();
                         refreshGrid();
@@ -167,21 +177,19 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                 if (this.student != null)
                 {
                     binder.writeBean(this.student);
-                    if(username.getValue().trim()=="" || vorname.getValue().trim()=="" || nachname.getValue().trim()=="" || email.getValue().trim()=="" || passwort.getValue().trim()=="" || level.getValue().trim()=="")
+                    if(username.getValue().trim()=="" || firstname.getValue().trim()=="" || lastname.getValue().trim()=="" || email.getValue().trim()=="" || password.getValue().trim()=="" || level.getValue().trim()=="")
                     {
                         Notification.show("Bitte alle Felder ausfüllen.");
                     }
                     else
                     {
+                            this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
                             studentService.update(this.student);
                             clearForm();
                             refreshGrid();
                             Notification.show("Neuer Student wurde angelegt.");
                     }
                }
-
-
-
 
             UI.getCurrent().navigate(StudentenView.class);
         } catch (ValidationException validationException) {
@@ -218,12 +226,12 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
         FormLayout formLayout = new FormLayout();
         username = new TextField("Username");
-        vorname = new TextField("Vorname");
-        nachname = new TextField("Nachname");
+        firstname = new TextField("Vorname");
+        lastname = new TextField("Nachname");
         email = new TextField("Email");
-        passwort = new TextField("Passwort");
+        password = new TextField("Passwort");
         level = new TextField("Level");
-        Component[] fields = new Component[]{username, vorname, nachname, email, passwort, level};
+        Component[] fields = new Component[]{username, firstname, lastname, email, password, level};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);

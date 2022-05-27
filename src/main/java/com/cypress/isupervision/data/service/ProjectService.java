@@ -1,6 +1,6 @@
 package com.cypress.isupervision.data.service;
 
-import com.cypress.isupervision.data.entity.project.Projekt;
+import com.cypress.isupervision.data.entity.project.Project;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +9,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProjektService {
+public class ProjectService {
 
-    private final ProjektRepository repository;
+    private final ProjectRepository repository;
 
     @Autowired
-    public ProjektService(ProjektRepository repository) {
+    public ProjectService(ProjectRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<Projekt> get(UUID id) {
+    public Optional<Project> get(UUID id) {
         return repository.findById(id);
     }
 
-    public Projekt update(Projekt entity) {
+    public Project update(Project entity) {
         return repository.save(entity);
     }
 
@@ -30,7 +30,7 @@ public class ProjektService {
         repository.deleteById(id);
     }
 
-    public Page<Projekt> list(Pageable pageable) {
+    public Page<Project> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 

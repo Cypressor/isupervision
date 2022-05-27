@@ -1,7 +1,7 @@
 package com.cypress.isupervision.views.bachelorarbeiten;
 
-import com.cypress.isupervision.data.entity.project.Bachelorarbeit;
-import com.cypress.isupervision.data.service.BachelorarbeitService;
+import com.cypress.isupervision.data.entity.project.BachelorsThesis;
+import com.cypress.isupervision.data.service.BachelorsThesisService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -30,32 +30,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 @PageTitle("Bachelorarbeiten")
-@Route(value = "bachelorarbeiten/:bachelorarbeitID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "bachelorsthesis/:bachelorsthesisID?/:action?(edit)", layout = MainLayout.class)
 @PermitAll
 public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
 
-    private final String BACHELORARBEIT_ID = "bachelorarbeitID";
-    private final String BACHELORARBEIT_EDIT_ROUTE_TEMPLATE = "bachelorarbeiten/%s/edit";
+    private final String BACHELORSTHESIS_ID = "bachelorsthesisID";
+    private final String BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE = "bachelorsthesis/%s/edit";
 
-    private Grid<Bachelorarbeit> grid = new Grid<>(Bachelorarbeit.class, false);
+    private Grid<BachelorsThesis> grid = new Grid<>(BachelorsThesis.class, false);
 
-    private TextField titel;
-    private TextField assistent;
+    private TextField title;
+    private TextField assistant;
     private TextField student;
     private DatePicker deadline;
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private BeanValidationBinder<Bachelorarbeit> binder;
+    private BeanValidationBinder<BachelorsThesis> binder;
 
-    private Bachelorarbeit bachelorarbeit;
+    private BachelorsThesis bachelorsThesis;
 
-    private final BachelorarbeitService bachelorarbeitService;
+    private final BachelorsThesisService bachelorsThesisService;
 
     @Autowired
-    public BachelorarbeitenView(BachelorarbeitService bachelorarbeitService) {
-        this.bachelorarbeitService = bachelorarbeitService;
+    public BachelorarbeitenView(BachelorsThesisService bachelorsThesisService) {
+        this.bachelorsThesisService = bachelorsThesisService;
         addClassNames("bachelorarbeiten-view");
 
         // Create UI
@@ -67,11 +67,17 @@ public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("titel").setAutoWidth(true);
-        grid.addColumn("assistent").setAutoWidth(true);
+        grid.addColumn("title").setAutoWidth(true);
+        grid.addColumn("assistant").setAutoWidth(true);
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
-        grid.setItems(query -> bachelorarbeitService.list(
+
+        grid.getColumnByKey("title").setHeader("Titel");
+        grid.getColumnByKey("assistant").setHeader("Assistent");
+        grid.getColumnByKey("student").setHeader("Student");
+        grid.getColumnByKey("deadline").setHeader("Deadline");
+
+        grid.setItems(query -> bachelorsThesisService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -79,7 +85,7 @@ public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(BACHELORARBEIT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(String.format(BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
             } else {
                 clearForm();
                 UI.getCurrent().navigate(BachelorarbeitenView.class);
@@ -87,7 +93,7 @@ public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
         });
 
         // Configure Form
-        binder = new BeanValidationBinder<>(Bachelorarbeit.class);
+        binder = new BeanValidationBinder<>(BachelorsThesis.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
 
@@ -100,12 +106,12 @@ public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.bachelorarbeit == null) {
-                    this.bachelorarbeit = new Bachelorarbeit();
+                if (this.bachelorsThesis == null) {
+                    this.bachelorsThesis = new BachelorsThesis();
                 }
-                binder.writeBean(this.bachelorarbeit);
+                binder.writeBean(this.bachelorsThesis);
 
-                bachelorarbeitService.update(this.bachelorarbeit);
+                bachelorsThesisService.update(this.bachelorsThesis);
                 clearForm();
                 refreshGrid();
                 Notification.show("Bachelorarbeit details stored.");
@@ -119,9 +125,9 @@ public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Optional<UUID> bachelorarbeitId = event.getRouteParameters().get(BACHELORARBEIT_ID).map(UUID::fromString);
+        Optional<UUID> bachelorarbeitId = event.getRouteParameters().get(BACHELORSTHESIS_ID).map(UUID::fromString);
         if (bachelorarbeitId.isPresent()) {
-            Optional<Bachelorarbeit> bachelorarbeitFromBackend = bachelorarbeitService.get(bachelorarbeitId.get());
+            Optional<BachelorsThesis> bachelorarbeitFromBackend = bachelorsThesisService.get(bachelorarbeitId.get());
             if (bachelorarbeitFromBackend.isPresent()) {
                 populateForm(bachelorarbeitFromBackend.get());
             } else {
@@ -145,11 +151,11 @@ public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        titel = new TextField("Titel");
-        assistent = new TextField("Assistent");
+        title = new TextField("Titel");
+        assistant = new TextField("Assistent");
         student = new TextField("Student");
         deadline = new DatePicker("Deadline");
-        Component[] fields = new Component[]{titel, assistent, student, deadline};
+        Component[] fields = new Component[]{title, assistant, student, deadline};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -183,9 +189,9 @@ public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(Bachelorarbeit value) {
-        this.bachelorarbeit = value;
-        binder.readBean(this.bachelorarbeit);
+    private void populateForm(BachelorsThesis value) {
+        this.bachelorsThesis = value;
+        binder.readBean(this.bachelorsThesis);
 
     }
 }

@@ -1,6 +1,6 @@
 package com.cypress.isupervision.data.service;
 
-import com.cypress.isupervision.data.entity.project.Bachelorarbeit;
+import com.cypress.isupervision.data.entity.project.BachelorsThesis;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +9,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BachelorarbeitService {
+public class BachelorsThesisService {
 
-    private final BachelorarbeitRepository repository;
+    private final BachelorsThesisRepository repository;
 
     @Autowired
-    public BachelorarbeitService(BachelorarbeitRepository repository) {
+    public BachelorsThesisService(BachelorsThesisRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<Bachelorarbeit> get(UUID id) {
+    public Optional<BachelorsThesis> get(UUID id) {
         return repository.findById(id);
     }
 
-    public Bachelorarbeit update(Bachelorarbeit entity) {
+    public BachelorsThesis update(BachelorsThesis entity) {
         return repository.save(entity);
     }
 
@@ -30,7 +30,7 @@ public class BachelorarbeitService {
         repository.deleteById(id);
     }
 
-    public Page<Bachelorarbeit> list(Pageable pageable) {
+    public Page<BachelorsThesis> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 

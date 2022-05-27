@@ -1,7 +1,7 @@
 package com.cypress.isupervision.views.projekte;
 
-import com.cypress.isupervision.data.entity.project.Projekt;
-import com.cypress.isupervision.data.service.ProjektService;
+import com.cypress.isupervision.data.entity.project.Project;
+import com.cypress.isupervision.data.service.ProjectService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -31,17 +31,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 @PageTitle("Projekte")
-@Route(value = "projekte/:projektID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "projects/:projectID?/:action?(edit)", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
 @PermitAll
 public class ProjekteView extends Div implements BeforeEnterObserver {
 
-    private final String PROJEKT_ID = "projektID";
-    private final String PROJEKT_EDIT_ROUTE_TEMPLATE = "projekte/%s/edit";
+    private final String PROJECT_ID = "projectID";
+    private final String PROJECT_EDIT_ROUTE_TEMPLATE = "projects/%s/edit";
 
-    private Grid<Projekt> grid = new Grid<>(Projekt.class, false);
+    private Grid<Project> grid = new Grid<>(Project.class, false);
 
-    private TextField titel;
+    private TextField title;
     private TextField assistant;
     private TextField student;
     private DatePicker deadline;
@@ -49,15 +49,15 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private BeanValidationBinder<Projekt> binder;
+    private BeanValidationBinder<Project> binder;
 
-    private Projekt projekt;
+    private Project project;
 
-    private final ProjektService projektService;
+    private final ProjectService projectService;
 
     @Autowired
-    public ProjekteView(ProjektService projektService) {
-        this.projektService = projektService;
+    public ProjekteView(ProjectService projectService) {
+        this.projectService = projectService;
         addClassNames("projekte-view");
 
         // Create UI
@@ -69,11 +69,18 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("titel").setAutoWidth(true);
+        grid.addColumn("title").setAutoWidth(true);
         grid.addColumn("assistant").setAutoWidth(true);
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
-        grid.setItems(query -> projektService.list(
+
+        grid.getColumnByKey("title").setHeader("Titel");
+        grid.getColumnByKey("assistant").setHeader("Assistent");
+        grid.getColumnByKey("student").setHeader("Student");
+        grid.getColumnByKey("deadline").setHeader("Deadline");
+
+
+        grid.setItems(query -> projectService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -81,7 +88,7 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(PROJEKT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(String.format(PROJECT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
             } else {
                 clearForm();
                 UI.getCurrent().navigate(ProjekteView.class);
@@ -89,7 +96,7 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
         });
 
         // Configure Form
-        binder = new BeanValidationBinder<>(Projekt.class);
+        binder = new BeanValidationBinder<>(Project.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
 
@@ -102,12 +109,12 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.projekt == null) {
-                    this.projekt = new Projekt();
+                if (this.project == null) {
+                    this.project = new Project();
                 }
-                binder.writeBean(this.projekt);
+                binder.writeBean(this.project);
 
-                projektService.update(this.projekt);
+                projectService.update(this.project);
                 clearForm();
                 refreshGrid();
                 Notification.show("Projekt details stored.");
@@ -121,9 +128,9 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Optional<UUID> projektId = event.getRouteParameters().get(PROJEKT_ID).map(UUID::fromString);
+        Optional<UUID> projektId = event.getRouteParameters().get(PROJECT_ID).map(UUID::fromString);
         if (projektId.isPresent()) {
-            Optional<Projekt> projektFromBackend = projektService.get(projektId.get());
+            Optional<Project> projektFromBackend = projectService.get(projektId.get());
             if (projektFromBackend.isPresent()) {
                 populateForm(projektFromBackend.get());
             } else {
@@ -146,11 +153,11 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        titel = new TextField("Titel");
+        title = new TextField("Titel");
         assistant = new TextField("Assistant");
         student = new TextField("Student");
         deadline = new DatePicker("Deadline");
-        Component[] fields = new Component[]{titel, assistant, student, deadline};
+        Component[] fields = new Component[]{title, assistant, student, deadline};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -184,9 +191,9 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(Projekt value) {
-        this.projekt = value;
-        binder.readBean(this.projekt);
+    private void populateForm(Project value) {
+        this.project = value;
+        binder.readBean(this.project);
 
     }
 }

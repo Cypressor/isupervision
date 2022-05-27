@@ -1,6 +1,6 @@
 package com.cypress.isupervision.data.service;
 
-import com.cypress.isupervision.data.entity.user.Assistent;
+import com.cypress.isupervision.data.entity.user.Assistant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +9,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AssistentService {
+public class AssistantService {
 
-    private final AssistentRepository repository;
+    private final AssistantRepository repository;
 
     @Autowired
-    public AssistentService(AssistentRepository repository) {
+    public AssistantService(AssistantRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<Assistent> get(UUID id) {
+    public Optional<Assistant> get(UUID id) {
         return repository.findById(id);
     }
 
-    public Assistent update(Assistent entity) {
+    public Assistant update(Assistant entity) {
         return repository.save(entity);
     }
 
@@ -30,7 +30,7 @@ public class AssistentService {
         repository.deleteById(id);
     }
 
-    public Page<Assistent> list(Pageable pageable) {
+    public Page<Assistant> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 

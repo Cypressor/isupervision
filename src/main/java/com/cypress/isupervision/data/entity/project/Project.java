@@ -6,25 +6,25 @@ import java.time.LocalDate;
 import javax.persistence.Entity;
 
 @Entity
-public class Bachelorarbeit extends AbstractEntity
+public class Project extends AbstractEntity
 {
 
-    private String titel;
-    private String assistent;
+    private String title;
+    private String assistant;
     private String student;
     private LocalDate deadline;
 
-    public String getTitel() {
-        return titel;
+    public String getTitle() {
+        return title;
     }
-    public void setTitel(String titel) {
-        this.titel = titel;
+    public void setTitle(String titel) {
+        this.title = titel;
     }
-    public String getAssistent() {
-        return assistent;
+    public String getAssistant() {
+        return assistant;
     }
-    public void setAssistent(String assistent) {
-        this.assistent = assistent;
+    public void setAssistant(String assistant) {
+        this.assistant = assistant;
     }
     public String getStudent() {
         return student;

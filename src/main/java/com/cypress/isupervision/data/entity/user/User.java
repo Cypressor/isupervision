@@ -12,10 +12,10 @@ public class User extends AbstractEntity
 {
 
     private String username;
-    private String vorname;
-    private String nachname;
+    private String firstname;
+    private String lastname;
     private String email;
-    private String passwort;
+    private String password;
     @JsonIgnore
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
@@ -35,16 +35,12 @@ public class User extends AbstractEntity
     public void setEmail(String email) {
         this.email = email;
     }
-    public String getPasswort() {
-        return passwort;
-    }
-    public void setPasswort(String passwort) {
-        this.passwort = passwort;
-    }
-    public String getVorname() {return vorname; }
-    public void setVorname(String vorname) { this.vorname = vorname;}
-    public String getNachname() {return nachname; }
-    public void setNachname(String nachname) { this.nachname = nachname;}
+    public String getFirstname() { return firstname; }
+    public void setFirstname(String firstname) { this.firstname = firstname; }
+    public String getLastname() { return lastname; }
+    public void setLastname(String lastname) { this.lastname = lastname; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
     public String getUsername() {
         return username;
     }

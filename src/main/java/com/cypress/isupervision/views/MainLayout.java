@@ -100,7 +100,7 @@ public class MainLayout extends AppLayout {
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
 
-            Avatar avatar = new Avatar(user.getVorname()+" "+user.getNachname(), user.getProfilePictureUrl());
+            Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
             avatar.addClassNames("me-xs");
 
             ContextMenu userMenu = new ContextMenu(avatar);
@@ -109,7 +109,7 @@ public class MainLayout extends AppLayout {
                 authenticatedUser.logout();
             });
 
-            Span name = new Span(user.getVorname()+" "+user.getNachname());
+            Span name = new Span(user.getUsername());
             name.addClassNames("font-medium", "text-s", "text-secondary");
 
             layout.add(avatar, name);

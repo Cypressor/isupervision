@@ -5,13 +5,13 @@ import javax.persistence.Entity;
 import java.util.Collections;
 
 @Entity
-public class Assistent extends User {
+public class Assistant extends User {
 
     private Integer projLimit;
     private Integer baLimit;
     private Integer maLimit;
 
-    public Assistent()
+    public Assistant()
     {
         this.setRoles(Collections.singleton(Role.ASSISTENT));
         this.projLimit=1000;

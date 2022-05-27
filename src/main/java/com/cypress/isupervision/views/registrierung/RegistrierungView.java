@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 import javax.annotation.security.PermitAll;
 
 @PageTitle("Registrierung")
-@Route(value = "registrierung", layout = MainLayout.class)
+@Route(value = "registration", layout = MainLayout.class)
 
 public class RegistrierungView extends VerticalLayout {
 
