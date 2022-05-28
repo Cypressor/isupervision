@@ -8,7 +8,6 @@ import com.cypress.isupervision.views.bachelorarbeiten.BachelorarbeitenView;
 import com.cypress.isupervision.views.masterarbeiten.MasterarbeitenView;
 import com.cypress.isupervision.views.meineprojekte.MeineProjekteView;
 import com.cypress.isupervision.views.projekte.ProjekteView;
-import com.cypress.isupervision.views.registrierung.RegistrierungView;
 import com.cypress.isupervision.views.studenten.StudentenView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -152,8 +151,6 @@ public class MainLayout extends AppLayout {
                 new MenuItemInfo("Assistenten", "", AssistentenView.class), //
 
                 new MenuItemInfo("Account", "", AccountView.class), //
-
-                new MenuItemInfo("Registrierung", "", RegistrierungView.class), //
 
         };
     }

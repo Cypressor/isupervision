@@ -1,10 +1,7 @@
 package com.cypress.isupervision.views.studenten;
 
 import com.cypress.isupervision.data.entity.user.Student;
-import com.cypress.isupervision.data.entity.user.User;
-import com.cypress.isupervision.data.service.StudentRepository;
 import com.cypress.isupervision.data.service.StudentService;
-import com.cypress.isupervision.data.service.UserRepository;
 import com.cypress.isupervision.data.service.UserService;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -20,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -32,12 +30,8 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
-import javax.swing.*;
-
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mapping.model.Property;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
@@ -54,14 +48,14 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private TextField username;
     private TextField firstname;
     private TextField lastname;
-    private TextField email;
+    private EmailField email;
     private TextField password;
     private TextField level;
 
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");
-    private Button delete = new Button("Delete");
-    private Button edit = new Button("Edit");
+    private Button cancel = new Button("Abbrechen");
+    private Button save = new Button("Speichern");
+    private Button delete = new Button("Löschen");
+    private Button edit = new Button("Ändern");
 
     private BeanValidationBinder<Student> binder;
 
@@ -135,28 +129,36 @@ public class StudentenView extends Div implements BeforeEnterObserver {
             //    }
                 binder.writeBean(this.student);
 
-                if(username.getValue().trim()=="" || firstname.getValue().trim()=="" || lastname.getValue().trim()=="" || email.getValue().trim()=="" || password.getValue().trim()=="" || level.getValue().trim()=="")
+                if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || level.getValue().trim().equals(""))
                 {
                     Notification.show("Bitte alle Felder ausfüllen.");
                 }
                 else
                 {
+                    if (this.student != null)
+                    {
                     int exists = userService.exists(this.student);
-                    if (exists == 0 || exists == 1)
+                    if (exists == 0)
                     {
                         this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
                         studentService.update(this.student);
                         clearForm();
                         refreshGrid();
                         Notification.show("Neuer Student wurde angelegt.");
+
                     }
                    if (exists == 1 || exists == 3)
                     {
+                        clearForm();
+                        refreshGrid();
                         Notification.show("Username existiert bereits.");
                     }
                     if (exists == 2 || exists == 3)
                     {
+                        clearForm();
+                        refreshGrid();
                         Notification.show("Email existiert bereits");
+                    }
                     }
                 }
                 UI.getCurrent().navigate(StudentenView.class);
@@ -177,7 +179,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                 if (this.student != null)
                 {
                     binder.writeBean(this.student);
-                    if(username.getValue().trim()=="" || firstname.getValue().trim()=="" || lastname.getValue().trim()=="" || email.getValue().trim()=="" || password.getValue().trim()=="" || level.getValue().trim()=="")
+                    if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || level.getValue().trim().equals(""))
                     {
                         Notification.show("Bitte alle Felder ausfüllen.");
                     }
@@ -187,9 +189,13 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                             studentService.update(this.student);
                             clearForm();
                             refreshGrid();
-                            Notification.show("Neuer Student wurde angelegt.");
+                            Notification.show("Student wurde bearbeitet.");
                     }
                }
+                else
+                {
+                    Notification.show("Kein Student ausgewählt.");
+                }
 
             UI.getCurrent().navigate(StudentenView.class);
         } catch (ValidationException validationException) {
@@ -228,7 +234,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         username = new TextField("Username");
         firstname = new TextField("Vorname");
         lastname = new TextField("Nachname");
-        email = new TextField("Email");
+        email = new EmailField("Email");
         password = new TextField("Passwort");
         level = new TextField("Level");
         Component[] fields = new Component[]{username, firstname, lastname, email, password, level};

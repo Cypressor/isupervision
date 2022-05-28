@@ -12,6 +12,7 @@ import com.vaadin.exampledata.ExampleDataGenerator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +34,12 @@ public class DataGenerator {
                 logger.info("Using existing database");
                 return;
             }
-            int seed = 123;
-            Random rng = new Random();
 
             logger.info("Generating demo data");
+            Random rng = new Random();
 
-            logger.info("... generating 3 User entities...");
+            logger.info("Generating 3 main test users");
+
             Student student = new Student();
             student.setFirstname("stu");
             student.setLastname("dent");
@@ -67,76 +68,121 @@ public class DataGenerator {
             student.setRoles(Collections.singleton(Role.ASSISTENT));
             assistantRepository.save(assistant);
 
-           Administrator admin = new Administrator();
+            Administrator admin = new Administrator();
             admin.setFirstname("ad");
             admin.setLastname("min");
-            admin.setUsername("testadminpw");
-            admin.setHashedPassword(admin.getPassword());
+            admin.setUsername("admin");
+            admin.setPassword("verysecureadminpw");
+            admin.setHashedPassword(passwordEncoder.encode(admin.getPassword()));
             admin.setProfilePictureUrl(
                     "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
             administratorRepository.save(admin);
 
 
-            logger.info("... generating 100 Projekt entities...");
-            ExampleDataGenerator<Project> projectRepositoryGenerator = new ExampleDataGenerator<>(Project.class,
-                    LocalDateTime.of(2022, 5, 24, 0, 0, 0));
-            projectRepositoryGenerator.setData(Project::setTitle, DataType.SENTENCE);
-            projectRepositoryGenerator.setData(Project::setAssistant, DataType.FULL_NAME);
-            projectRepositoryGenerator.setData(Project::setStudent, DataType.FULL_NAME);
-            projectRepositoryGenerator.setData(Project::setDeadline, DataType.DATE_OF_BIRTH);
-            projectRepository.saveAll(projectRepositoryGenerator.create(100, seed));
-
-            seed = 234;
-
-            logger.info("... generating 100 Bachelorarbeit entities...");
-            ExampleDataGenerator<BachelorsThesis> bachelorarbeitRepositoryGenerator = new ExampleDataGenerator<>(
-                    BachelorsThesis.class, LocalDateTime.of(2022, 5, 24, 0, 0, 0));
-            bachelorarbeitRepositoryGenerator.setData(BachelorsThesis::setTitle, DataType.SENTENCE);
-            bachelorarbeitRepositoryGenerator.setData(BachelorsThesis::setAssistant, DataType.FULL_NAME);
-            bachelorarbeitRepositoryGenerator.setData(BachelorsThesis::setStudent, DataType.FULL_NAME);
-            bachelorarbeitRepositoryGenerator.setData(BachelorsThesis::setDeadline, DataType.DATE_OF_BIRTH);
-            bachelorsThesisRepository.saveAll(bachelorarbeitRepositoryGenerator.create(100, seed));
-
-            seed = 345;
-
-            logger.info("... generating 100 Masterarbeit entities...");
-            ExampleDataGenerator<MastersThesis> masterarbeitRepositoryGenerator = new ExampleDataGenerator<>(
-                    MastersThesis.class, LocalDateTime.of(2022, 5, 24, 0, 0, 0));
-            masterarbeitRepositoryGenerator.setData(MastersThesis::setTitle, DataType.SENTENCE);
-            masterarbeitRepositoryGenerator.setData(MastersThesis::setAssistant, DataType.FULL_NAME);
-            masterarbeitRepositoryGenerator.setData(MastersThesis::setStudent, DataType.FULL_NAME);
-            masterarbeitRepositoryGenerator.setData(MastersThesis::setDeadline, DataType.DATE_OF_BIRTH);
-            masterarbeitRepositoryGenerator.setData(MastersThesis::setExamDate, DataType.DATE_OF_BIRTH);
-            mastersThesisRepository.saveAll(masterarbeitRepositoryGenerator.create(100, seed));
-
-            seed = 456;
-
-
-            logger.info("... generating 100 Student entities...");
+            logger.info("... generating 20 Student entities...");
+            List<Student> students;
+            int seed = 123;
             ExampleDataGenerator<Student> studentRepositoryGenerator = new ExampleDataGenerator<>(Student.class,
                     LocalDateTime.of(2022, 5, 24, 0, 0, 0));
-            studentRepositoryGenerator.setData(Student::setUsername, (DataType.FIRST_NAME));
             studentRepositoryGenerator.setData(Student::setFirstname, DataType.FIRST_NAME);
             studentRepositoryGenerator.setData(Student::setLastname, DataType.LAST_NAME);
             studentRepositoryGenerator.setData(Student::setEmail, DataType.EMAIL);
             studentRepositoryGenerator.setData(Student::setPassword, DataType.TWO_WORDS);
-            studentRepositoryGenerator.setData(Student::setLevel, DataType.NUMBER_UP_TO_10);
-            studentRepository.saveAll(studentRepositoryGenerator.create(100, seed));
+            studentRepositoryGenerator.setData(Student::setProfilePictureUrl, DataType.PROFILE_PICTURE_URL);
+            students=studentRepositoryGenerator.create(50, seed);
+            for (int i=0; i<students.size();i++)
+            {
+                student = students.get(i);
+                student.setUsername("teststudent"+(i+1));
+                student.setHashedPassword(passwordEncoder.encode(student.getPassword()));
+                student.setLevel(rng.nextInt(3));
+                students.set(i,student);
+            }
+            studentRepository.saveAll(students);
 
-            seed = 567;
 
-            logger.info("... generating 100 Assistent entities...");
+            logger.info("... generating 5 Assistant entities...");
+            List<Assistant> assistants;
+            seed = 234;
             ExampleDataGenerator<Assistant> assistantRepositoryGenerator = new ExampleDataGenerator<>(Assistant.class,
                     LocalDateTime.of(2022, 5, 24, 0, 0, 0));
-            assistantRepositoryGenerator.setData(Assistant::setUsername, DataType.FIRST_NAME);
+
             assistantRepositoryGenerator.setData(Assistant::setFirstname, DataType.FIRST_NAME);
             assistantRepositoryGenerator.setData(Assistant::setLastname, DataType.LAST_NAME);
             assistantRepositoryGenerator.setData(Assistant::setEmail, DataType.EMAIL);
             assistantRepositoryGenerator.setData(Assistant::setPassword, DataType.TWO_WORDS);
-            assistantRepositoryGenerator.setData(Assistant::setProjLimit, DataType.NUMBER_UP_TO_100);
-            assistantRepositoryGenerator.setData(Assistant::setBaLimit, DataType.NUMBER_UP_TO_100);
-            assistantRepositoryGenerator.setData(Assistant::setMaLimit, DataType.NUMBER_UP_TO_100);
-            assistantRepository.saveAll(assistantRepositoryGenerator.create(100, seed));
+            assistants=assistantRepositoryGenerator.create(5, seed);
+            for (int i=0; i<assistants.size();i++)
+            {
+                assistant = assistants.get(i);
+                assistant.setUsername("testassistant"+(i+1));
+                assistant.setHashedPassword(passwordEncoder.encode(assistant.getPassword()));
+                assistant.setProjLimit(rng.nextInt(20));
+                assistant.setBaLimit(rng.nextInt(20));
+                assistant.setMaLimit(rng.nextInt(20));
+                assistants.set(i,assistant);
+            }
+            assistantRepository.saveAll(assistants);
+
+            logger.info("... generating 20 Project entities...");
+            seed = 345;
+            List<Project> projects;
+            Project project;
+            int randomNumber;
+            ExampleDataGenerator<Project> projectRepositoryGenerator = new ExampleDataGenerator<>(Project.class,
+                    LocalDateTime.of(2022, 5, 24, 0, 0, 0));
+            projectRepositoryGenerator.setData(Project::setTitle, DataType.SENTENCE);
+            projectRepositoryGenerator.setData(Project::setDeadline, DataType.DATE_NEXT_1_YEAR);
+            projects=projectRepositoryGenerator.create(20, seed);
+            for (int i=0; i<projects.size();i++)
+            {
+                project = projects.get(i);
+                randomNumber= rng.nextInt(4);
+                project.setAssistant(assistants.get(randomNumber).getFirstname()+" "+assistants.get(randomNumber).getLastname());
+                projects.set(i,project);
+            }
+            projectRepository.saveAll(projects);
+
+
+            logger.info("... generating 20 BachelorsThesis entities...");
+            seed = 456;
+            List<BachelorsThesis> bachelorsTheses;
+            BachelorsThesis bachelorsThesis;
+
+            ExampleDataGenerator<BachelorsThesis> bachelorarbeitRepositoryGenerator = new ExampleDataGenerator<>(
+                    BachelorsThesis.class, LocalDateTime.of(2022, 5, 24, 0, 0, 0));
+            bachelorarbeitRepositoryGenerator.setData(BachelorsThesis::setTitle, DataType.SENTENCE);
+            bachelorarbeitRepositoryGenerator.setData(BachelorsThesis::setDeadline, DataType.DATE_NEXT_1_YEAR);
+            bachelorsTheses=bachelorarbeitRepositoryGenerator.create(20, seed);
+            for (int i=0; i<projects.size();i++)
+            {
+                bachelorsThesis = bachelorsTheses.get(i);
+                randomNumber= rng.nextInt(4);
+                bachelorsThesis.setAssistant(assistants.get(randomNumber).getFirstname()+" "+assistants.get(randomNumber).getLastname());
+                bachelorsTheses.set(i,bachelorsThesis);
+            }
+            bachelorsThesisRepository.saveAll(bachelorsTheses);
+
+
+            logger.info("... generating 20 MastersThesis entities...");
+            seed = 567;
+            List<MastersThesis> mastersTheses;
+            MastersThesis mastersThesis;
+
+            ExampleDataGenerator<MastersThesis> masterarbeitRepositoryGenerator = new ExampleDataGenerator<>(
+                    MastersThesis.class, LocalDateTime.of(2022, 5, 24, 0, 0, 0));
+            masterarbeitRepositoryGenerator.setData(MastersThesis::setTitle, DataType.SENTENCE);
+            masterarbeitRepositoryGenerator.setData(MastersThesis::setDeadline, DataType.DATE_NEXT_1_YEAR);
+            masterarbeitRepositoryGenerator.setData(MastersThesis::setExamDate, DataType.DATE_NEXT_1_YEAR);
+            mastersTheses= masterarbeitRepositoryGenerator.create(20, seed);
+            for (int i=0; i<projects.size();i++)
+            {
+                mastersThesis = mastersTheses.get(i);
+                randomNumber= rng.nextInt(4);
+                mastersThesis.setAssistant(assistants.get(randomNumber).getFirstname()+" "+assistants.get(randomNumber).getLastname());
+                mastersTheses.set(i,mastersThesis);
+            }
+            mastersThesisRepository.saveAll(mastersTheses);
 
             logger.info("Generated demo data");
         };

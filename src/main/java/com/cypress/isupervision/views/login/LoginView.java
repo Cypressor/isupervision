@@ -1,37 +1,52 @@
 package com.cypress.isupervision.views.login;
-import com.vaadin.flow.component.login.LoginI18n;
-import com.vaadin.flow.component.login.LoginOverlay;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+
+import com.cypress.isupervision.data.service.AssistantService;
+import com.cypress.isupervision.data.service.StudentService;
+import com.cypress.isupervision.data.service.UserService;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @PageTitle("Login")
 @Route(value = "login")
-public class LoginView extends LoginOverlay
+public class LoginView extends VerticalLayout
 {
-    public LoginView() {
-        setAction("login");
+    LoginComponent loginComponent=new LoginComponent();
+    private StudentService studentService;
+    private AssistantService assistantService;
+    private UserService userService;
+    private PasswordEncoder passwordEncoder;
 
-        LoginI18n i18n = LoginI18n.createDefault();
-        i18n.setHeader(new LoginI18n.Header());
-        i18n.getHeader().setTitle("iSupervision");
-        i18n.getHeader().setDescription("Bitte loggen Sie sich ein, um Zugriff auf die Projektdaten zu bekommen.");
 
-        LoginI18n.Form i18nForm = i18n.getForm();
-        i18n.setForm(i18nForm);
+    @Autowired
+    public LoginView(StudentService studentService, AssistantService assistantService, UserService userService, PasswordEncoder passwordEncoder)
+    {
 
-        i18n.setErrorMessage(new LoginI18n.ErrorMessage());
-        i18n.getErrorMessage().setTitle("Fehler beim Login!");
-        i18n.getErrorMessage().setMessage("Username oder Passwort falsch. Bitte versuchen Sie es erneut.");
+        this.studentService=studentService;
+        this.assistantService=assistantService;
+        this.userService=userService;
 
-        i18n.setAdditionalInformation("bla");
-        setI18n(i18n);
+        RegistrationComponent registrationComponent=new RegistrationComponent(studentService, assistantService, userService, passwordEncoder);
 
-        setForgotPasswordButtonVisible(false);
-        setOpened(true);
+        add(loginComponent,registrationComponent);
+        registrationComponent.setAlignItems(Alignment.CENTER);
+        setAlignItems(Alignment.CENTER);
+    }
+
+
+
+
+
+
+
+
 
 
 
     }
 
 
-}
+
+
+

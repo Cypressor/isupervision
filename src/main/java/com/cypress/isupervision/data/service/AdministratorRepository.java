@@ -1,8 +1,6 @@
 package com.cypress.isupervision.data.service;
 
 import com.cypress.isupervision.data.entity.user.Administrator;
-import com.cypress.isupervision.data.entity.user.Assistant;
-import com.cypress.isupervision.data.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

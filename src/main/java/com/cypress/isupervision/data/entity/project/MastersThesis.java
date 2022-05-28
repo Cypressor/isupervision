@@ -4,10 +4,11 @@ import java.time.LocalDate;
 import javax.persistence.Entity;
 
 @Entity
-public class MastersThesis extends Project
+public class MastersThesis extends ProjectEntity
 {
 
     private LocalDate examDate;
+
 
     public LocalDate getExamDate()
     {

@@ -1,7 +1,6 @@
 package com.cypress.isupervision.data.service;
 
 import com.cypress.isupervision.data.entity.user.Administrator;
-import com.cypress.isupervision.data.entity.user.Assistant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

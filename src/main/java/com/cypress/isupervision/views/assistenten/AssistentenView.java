@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -45,16 +46,16 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
     private TextField username;
     private TextField firstname;
     private TextField lastname;
-    private TextField email;
+    private EmailField email;
     private TextField password;
     private TextField projLimit;
     private TextField baLimit;
     private TextField maLimit;
 
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");
-    private Button delete = new Button("Delete");
-    private Button edit = new Button("Edit");
+    private Button cancel = new Button("Abbrechen");
+    private Button save = new Button("Speichern");
+    private Button delete = new Button("Löschen");
+    private Button edit = new Button("Ändern");
 
     private BeanValidationBinder<Assistant> binder;
 
@@ -134,27 +135,34 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
                 //    }
                 binder.writeBean(this.assistant);
 
-                if(username.getValue().trim()=="" || firstname.getValue().trim()=="" || lastname.getValue().trim()=="" || email.getValue().trim()=="" || password.getValue().trim()=="" || projLimit.getValue().trim()=="" || baLimit.getValue().trim()==""  || maLimit.getValue().trim()=="")
+                if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || projLimit.getValue().trim().equals("") || baLimit.getValue().trim().equals("")  || maLimit.getValue().trim().equals(""))
                 {
                     Notification.show("Bitte alle Felder ausfüllen.");
                 }
                 else
                 {
-                    int exists = userService.exists(this.assistant);
-                    if (exists == 0 || exists == 1)
+                    if (this.assistant != null)
                     {
-                        assistantService.update(this.assistant);
-                        clearForm();
-                        refreshGrid();
-                        Notification.show("Neuer Student wurde angelegt.");
-                    }
-                    if (exists == 1 || exists == 3)
-                    {
-                        Notification.show("Username existiert bereits.");
-                    }
-                    if (exists == 2 || exists == 3)
-                    {
-                        Notification.show("Email existiert bereits");
+                        int exists = userService.exists(this.assistant);
+                        if (exists == 0)
+                        {
+                            assistantService.update(this.assistant);
+                            clearForm();
+                            refreshGrid();
+                            Notification.show("Neuer Assistent wurde angelegt.");
+                        }
+                        if (exists == 1 || exists == 3)
+                        {
+                            clearForm();
+                            refreshGrid();
+                            Notification.show("Username existiert bereits.");
+                        }
+                        if (exists == 2 || exists == 3)
+                        {
+                            clearForm();
+                            refreshGrid();
+                            Notification.show("Email existiert bereits");
+                        }
                     }
                 }
                 UI.getCurrent().navigate(StudentenView.class);
@@ -175,7 +183,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
                 if (this.assistant != null)
                 {
                     binder.writeBean(this.assistant);
-                    if(username.getValue().trim()=="" || firstname.getValue().trim()=="" || lastname.getValue().trim()=="" || email.getValue().trim()=="" || password.getValue().trim()==""  || projLimit.getValue().trim()=="" || baLimit.getValue().trim()==""  || maLimit.getValue().trim()=="")
+                    if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("")  || projLimit.getValue().trim().equals("") || baLimit.getValue().trim().equals("")  || maLimit.getValue().trim().equals(""))
                     {
                         Notification.show("Bitte alle Felder ausfüllen.");
                     }
@@ -184,7 +192,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
                         assistantService.update(this.assistant);
                         clearForm();
                         refreshGrid();
-                        Notification.show("Neuer Student wurde angelegt.");
+                        Notification.show("Assistent wurde bearbeitet.");
                     }
                 }
 
@@ -226,7 +234,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         username = new TextField("Benutzername");
         firstname = new TextField("Vorname");
         lastname = new TextField("Nachname");
-        email = new TextField("Email");
+        email = new EmailField("Email");
         password = new TextField("Passwort");
         projLimit = new TextField("Proj Limit");
         baLimit = new TextField("Ba Limit");

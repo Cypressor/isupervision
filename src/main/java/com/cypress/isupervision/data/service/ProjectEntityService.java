@@ -1,36 +1,37 @@
 package com.cypress.isupervision.data.service;
 
-import com.cypress.isupervision.data.entity.project.MastersThesis;
-import java.util.Optional;
-import java.util.UUID;
+
+import com.cypress.isupervision.data.entity.project.ProjectEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@Service
-public class MastersThesisService {
+import java.util.Optional;
+import java.util.UUID;
 
-    private final MastersThesisRepository repository;
+@Service
+public class ProjectEntityService
+{
+
+    private final ProjectEntityRepository repository;
 
     @Autowired
-    public MastersThesisService(MastersThesisRepository repository) {
+    public ProjectEntityService(ProjectEntityRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<MastersThesis> get(UUID id) {
+    public Optional<ProjectEntity> get(UUID id) {
         return repository.findById(id);
     }
 
-    public MastersThesis update(MastersThesis entity) {
-        return repository.save(entity);
-    }
+    public ProjectEntity update(ProjectEntity entity) {return repository.save(entity);}
 
     public void delete(UUID id) {
         repository.deleteById(id);
     }
 
-    public Page<MastersThesis> list(Pageable pageable) {
+    public Page<ProjectEntity> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 

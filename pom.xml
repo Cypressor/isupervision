@@ -82,10 +82,12 @@
             <groupId>com.vaadin</groupId>
             <!-- Replace artifactId with vaadin-core to use only free components -->
             <artifactId>vaadin</artifactId>
+            <version>23.0.9</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-spring-boot-starter</artifactId>
+            <version>23.0.9</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -126,7 +128,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-testbench</artifactId>
-            <scope>test</scope>
+            <version>23.0.9</version>
         </dependency>
         <!-- Include JUnit 4 support for TestBench and others -->
         <dependency>
@@ -151,6 +153,12 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <version>3.0.0-M6</version>
             <type>maven-plugin</type>
+        </dependency>
+        <dependency>
+            <groupId>in.sourceshift.genericmodules</groupId>
+            <artifactId>securityutils</artifactId>
+            <version>17.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
