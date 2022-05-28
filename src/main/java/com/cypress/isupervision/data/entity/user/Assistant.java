@@ -13,7 +13,7 @@ public class Assistant extends User {
 
     public Assistant()
     {
-        this.setRoles(Collections.singleton(Role.ASSISTENT));
+        this.setRoles(Collections.singleton(Role.ASSISTANT));
         this.projLimit=1000;
         this.baLimit=1000;
         this.maLimit=1000;

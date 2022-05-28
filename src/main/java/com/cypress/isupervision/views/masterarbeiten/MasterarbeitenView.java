@@ -47,10 +47,10 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
     private DatePicker deadline;
     private DatePicker examDate;
 
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");
-    private Button delete = new Button("Delete");
-    private Button edit = new Button("Edit");
+    private Button cancel = new Button("Abbrechen");
+    private Button save = new Button("Speichern");
+    private Button delete = new Button("Löschen");
+    private Button edit = new Button("Ändern");
 
     private BeanValidationBinder<MastersThesis> binder;
 
@@ -133,14 +133,14 @@ public class MasterarbeitenView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Optional<UUID> masterarbeitId = event.getRouteParameters().get(MASTERSTHESIS_ID).map(UUID::fromString);
-        if (masterarbeitId.isPresent()) {
-            Optional<MastersThesis> mastersThesisFromBackend = mastersThesisService.get(masterarbeitId.get());
+        Optional<UUID> masterThesisId = event.getRouteParameters().get(MASTERSTHESIS_ID).map(UUID::fromString);
+        if (masterThesisId.isPresent()) {
+            Optional<MastersThesis> mastersThesisFromBackend = mastersThesisService.get(masterThesisId.get());
             if (mastersThesisFromBackend.isPresent()) {
                 populateForm(mastersThesisFromBackend.get());
             } else {
                 Notification.show(
-                        String.format("The requested masterarbeit was not found, ID = %s", masterarbeitId.get()), 3000,
+                        String.format("The requested masterarbeit was not found, ID = %s", masterThesisId.get()), 3000,
                         Notification.Position.BOTTOM_START);
                 // when a row is selected but the data is no longer available,
                 // refresh grid

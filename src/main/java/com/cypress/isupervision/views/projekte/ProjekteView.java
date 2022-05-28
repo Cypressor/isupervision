@@ -24,7 +24,6 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +33,6 @@ import org.springframework.data.domain.PageRequest;
 
 @PageTitle("Projekte")
 @Route(value = "projects/:projectID?/:action?(edit)", layout = MainLayout.class)
-@RouteAlias(value = "", layout = MainLayout.class)
 @PermitAll
 public class ProjekteView extends Div implements BeforeEnterObserver {
 
@@ -48,10 +46,10 @@ public class ProjekteView extends Div implements BeforeEnterObserver {
     private TextField student;
     private DatePicker deadline;
 
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");
-    private Button delete = new Button("Delete");
-    private Button edit = new Button("Edit");
+    private Button cancel = new Button("Abbrechen");
+    private Button save = new Button("Speichern");
+    private Button delete = new Button("Löschen");
+    private Button edit = new Button("Ändern");
 
     private BeanValidationBinder<Project> binder;
 

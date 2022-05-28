@@ -1,4 +1,4 @@
-package com.cypress.isupervision.views.login;
+package com.cypress.isupervision.views.registration;
 
 import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.entity.user.Student;
@@ -6,9 +6,11 @@ import com.cypress.isupervision.data.entity.user.User;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.StudentService;
 import com.cypress.isupervision.data.service.UserService;
+import com.cypress.isupervision.views.login.LoginView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.details.Details;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -17,9 +19,14 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class RegistrationComponent extends VerticalLayout
+@PageTitle("Login")
+@Route(value = "register")
+@AnonymousAllowed
+public class RegistrationView extends VerticalLayout implements BeforeEnterObserver
 {
 
     final String ROLE_STUDENT = "Student";
@@ -42,7 +49,7 @@ public class RegistrationComponent extends VerticalLayout
     private Button registerButton = new Button ("Registrieren");
 
 
-    RegistrationComponent(StudentService studentService, AssistantService assistantService, UserService userService, PasswordEncoder passwordEncoder)
+    RegistrationView(StudentService studentService, AssistantService assistantService, UserService userService, PasswordEncoder passwordEncoder)
     {
 
 
@@ -84,6 +91,7 @@ public class RegistrationComponent extends VerticalLayout
                             studentService.update(this.student);
                             Notification.show("Neuer Student wurde erfolgreich registriert.");
                             clearForm();
+                            UI.getCurrent().navigate("login");
                         }
                         if (exists == 1 || exists == 3)
                         {
@@ -107,6 +115,7 @@ public class RegistrationComponent extends VerticalLayout
                             assistantService.update(this.assistant);
                             Notification.show("Neuer Assistent wurde erfolgreich registriert.");
                             clearForm();
+                            UI.getCurrent().navigate("login");
                         }
                         if (exists == 1 || exists == 3)
                         {
@@ -129,6 +138,12 @@ public class RegistrationComponent extends VerticalLayout
             }
 
         });
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent)
+    {
+
     }
 
     private void clearForm() {
@@ -154,10 +169,9 @@ public class RegistrationComponent extends VerticalLayout
         HorizontalLayout passwordLayout= new HorizontalLayout();
         passwordLayout.add(password1,password2);
 
-        VerticalLayout registrationLayout = new VerticalLayout();
-        registrationLayout.add(usernameLayout,nameLayout,roleLayout,passwordLayout, registerButton);
-        registrationLayout.setAlignItems(Alignment.CENTER);
-        Details registrationForm = new Details("Registrierung",registrationLayout);
-        add(registrationForm);
+        add(new H1("Registrierung"));
+        add(usernameLayout,nameLayout,roleLayout,passwordLayout, registerButton);
+        setAlignItems(Alignment.CENTER);
+        add(new RouterLink("Login", LoginView.class));
     }
 }

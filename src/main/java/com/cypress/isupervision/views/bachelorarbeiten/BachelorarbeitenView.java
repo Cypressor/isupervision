@@ -46,10 +46,10 @@ public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
     private TextField student;
     private DatePicker deadline;
 
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");
-    private Button delete = new Button("Delete");
-    private Button edit = new Button("Edit");
+    private Button cancel = new Button("Abbrechen");
+    private Button save = new Button("Speichern");
+    private Button delete = new Button("Löschen");
+    private Button edit = new Button("Ändern");
 
     private BeanValidationBinder<BachelorsThesis> binder;
 

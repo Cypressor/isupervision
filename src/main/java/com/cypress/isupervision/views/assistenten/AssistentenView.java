@@ -3,7 +3,6 @@ import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.UserService;
 import com.cypress.isupervision.views.MainLayout;
-import com.cypress.isupervision.views.studenten.StudentenView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -130,9 +129,9 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                //    if (this.student == null) {
+
                 this.assistant = new Assistant();
-                //    }
+
                 binder.writeBean(this.assistant);
 
                 if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || projLimit.getValue().trim().equals("") || baLimit.getValue().trim().equals("")  || maLimit.getValue().trim().equals(""))
@@ -165,7 +164,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
                         }
                     }
                 }
-                UI.getCurrent().navigate(StudentenView.class);
+                UI.getCurrent().navigate(AssistentenView.class);
             } catch (ValidationException validationException) {
                 Notification.show("Es ist leider etwas schief gegangen.");
             }
@@ -196,7 +195,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
                     }
                 }
 
-                UI.getCurrent().navigate(StudentenView.class);
+                UI.getCurrent().navigate(AssistentenView.class);
             } catch (ValidationException validationException) {
                 Notification.show("Es ist leider etwas schief gegangen.");
             }});

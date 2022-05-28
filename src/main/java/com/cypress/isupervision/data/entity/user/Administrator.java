@@ -14,7 +14,7 @@ public class Administrator extends User {
 
     public Administrator()
     {
-        this.setRoles(Set.of(Role.STUDENT, Role.ASSISTENT, Role.ADMIN));
+        this.setRoles(Set.of(Role.ADMIN, Role.ASSISTANT, Role.STUDENT));
         this.level=3;
         this.projLimit=1000;
         this.baLimit=1000;

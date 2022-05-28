@@ -2,7 +2,6 @@ package com.cypress.isupervision.views;
 
 import com.cypress.isupervision.data.entity.user.User;
 import com.cypress.isupervision.security.AuthenticatedUser;
-import com.cypress.isupervision.views.account.AccountView;
 import com.cypress.isupervision.views.assistenten.AssistentenView;
 import com.cypress.isupervision.views.bachelorarbeiten.BachelorarbeitenView;
 import com.cypress.isupervision.views.masterarbeiten.MasterarbeitenView;
@@ -10,6 +9,7 @@ import com.cypress.isupervision.views.meineprojekte.MeineProjekteView;
 import com.cypress.isupervision.views.projekte.ProjekteView;
 import com.cypress.isupervision.views.studenten.StudentenView;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
@@ -107,6 +107,9 @@ public class MainLayout extends AppLayout {
             userMenu.addItem("Logout", e -> {
                 authenticatedUser.logout();
             });
+            userMenu.addItem("Account", e -> {
+                UI.getCurrent().navigate("account");
+            });
 
             Span name = new Span(user.getUsername());
             name.addClassNames("font-medium", "text-s", "text-secondary");
@@ -149,8 +152,6 @@ public class MainLayout extends AppLayout {
                 new MenuItemInfo("Studenten", "", StudentenView.class), //
 
                 new MenuItemInfo("Assistenten", "", AssistentenView.class), //
-
-                new MenuItemInfo("Account", "", AccountView.class), //
 
         };
     }

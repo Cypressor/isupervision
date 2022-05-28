@@ -5,5 +5,6 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AssistantRepository extends JpaRepository<Assistant, UUID> {
-
+    Assistant findByUsername(String username);
+    Assistant findByEmail(String email);
 }

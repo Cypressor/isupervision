@@ -18,6 +18,8 @@ public class AssistantService {
         this.repository = repository;
     }
 
+    public Assistant get(String username) { return repository.findByUsername(username); }
+
     public Optional<Assistant> get(UUID id) {
         return repository.findById(id);
     }
