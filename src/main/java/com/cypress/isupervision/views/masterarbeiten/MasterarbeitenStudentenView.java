@@ -1,4 +1,4 @@
-package com.cypress.isupervision.views.projekte;
+package com.cypress.isupervision.views.masterarbeiten;
 
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.html.Div;
@@ -9,15 +9,17 @@ import com.vaadin.flow.router.Route;
 
 import javax.annotation.security.RolesAllowed;
 
-@PageTitle("Projekte Studenten")
-@Route(value = "projects/student/student:projectID?/:action?(edit)", layout = MainLayout.class)
+@PageTitle("Masterarbeiten Studenten")
+@Route(value = "mastersthesis/student/:mastersthesisID?/:action?(edit)", layout = MainLayout.class)
 @RolesAllowed("STUDENT")
-public class ProjekteStudentenView extends Div implements BeforeEnterObserver
+public class MasterarbeitenStudentenView extends Div implements BeforeEnterObserver
 {
+    private final String MASTERSTHESIS_ID = "mastersthesisID";
+    private final String MASTERSTHESIS_EDIT_ROUTE_TEMPLATE = "mastersthesis/student/%s/edit";
+
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent)
     {
 
     }
 }
-

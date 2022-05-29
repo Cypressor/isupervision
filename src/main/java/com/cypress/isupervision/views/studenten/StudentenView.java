@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 @PageTitle("Studenten")
 @Route(value = "students/:studentID?/:action?(edit)", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
@@ -42,41 +41,31 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
     private final String STUDENT_ID = "studentID";
     private final String STUDENT_EDIT_ROUTE_TEMPLATE = "students/%s/edit";
-
     private Grid<Student> grid = new Grid<>(Student.class, false);
-
     private TextField username;
     private TextField firstname;
     private TextField lastname;
     private EmailField email;
     private TextField password;
     private TextField level;
-
     private Button cancel = new Button("Abbrechen");
     private Button save = new Button("Speichern");
     private Button delete = new Button("Löschen");
     private Button edit = new Button("Ändern");
-
     private BeanValidationBinder<Student> binder;
-
     private Student student;
-
     private final StudentService studentService;
-
 
     @Autowired
     public StudentenView(StudentService studentService, UserService userService, PasswordEncoder passwordEncoder) {
 
         this.studentService = studentService;
-
         addClassNames("studenten-view");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
-
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
-
         add(splitLayout);
 
         // Configure Grid
@@ -114,19 +103,18 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
         // Bind fields. This is where you'd define e.g. validation rules
         binder.forField(level).withConverter(new StringToIntegerConverter("Only numbers are allowed")).bind("level");
-
         binder.bindInstanceFields(this);
 
+        //Hook up Cancel Button
         cancel.addClickListener(e -> {
             clearForm();
             refreshGrid();
         });
 
+        //Hook up Save Button
         save.addClickListener(e -> {
             try {
-
-                    this.student = new Student();
-
+                this.student = new Student();
                 binder.writeBean(this.student);
 
                 if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || level.getValue().trim().equals(""))
@@ -145,7 +133,6 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                         clearForm();
                         refreshGrid();
                         Notification.show("Neuer Student wurde angelegt.");
-
                     }
                    if (exists == 1 || exists == 3)
                     {
@@ -167,12 +154,14 @@ public class StudentenView extends Div implements BeforeEnterObserver {
             }
         });
 
+        //Hook up Delete Button
         delete.addClickListener(e -> {
             binder.readBean(this.student);
             studentService.delete(this.student.getId());
             refreshGrid();
         });
 
+        //Hook up Edit Button
         edit.addClickListener(e-> {
             try
             {
@@ -196,12 +185,10 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                 {
                     Notification.show("Kein Student ausgewählt.");
                 }
-
             UI.getCurrent().navigate(StudentenView.class);
         } catch (ValidationException validationException) {
             Notification.show("Es ist leider etwas schief gegangen.");
         }});
-
     }
 
     @Override
@@ -225,7 +212,6 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private void createEditorLayout(SplitLayout splitLayout) {
         Div editorLayoutDiv = new Div();
         editorLayoutDiv.setClassName("editor-layout");
-
         Div editorDiv = new Div();
         editorDiv.setClassName("editor");
         editorLayoutDiv.add(editorDiv);
@@ -242,7 +228,6 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         formLayout.add(fields);
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
-
         splitLayout.addToSecondary(editorLayoutDiv);
     }
 
@@ -285,6 +270,4 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         this.student = value;
         binder.readBean(this.student);
     }
-
-
 }

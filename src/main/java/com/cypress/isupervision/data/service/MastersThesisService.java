@@ -1,6 +1,7 @@
 package com.cypress.isupervision.data.service;
 
 import com.cypress.isupervision.data.entity.project.MastersThesis;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,22 @@ public class MastersThesisService {
         return repository.findAll(pageable);
     }
 
+    public List<MastersThesis> searchForAssistant(String assistantName) {return repository.searchForAssistant(assistantName);}
+    public List<MastersThesis> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
+
     public int count() {
         return (int) repository.count();
     }
 
+    public int exists(MastersThesis mastersThesis)
+    {
+        int exists=0;
+
+        MastersThesis tempMastersThesis = repository.findByTitle(mastersThesis.getTitle());
+        if (tempMastersThesis!= null)
+        {
+            exists+=1;
+        }
+        return exists;
+    }
 }

@@ -1,18 +1,17 @@
 package com.cypress.isupervision.data.service;
 
-
 import com.cypress.isupervision.data.entity.project.ProjectEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class ProjectEntityService
 {
-
     private final ProjectEntityRepository repository;
 
     @Autowired
@@ -34,8 +33,23 @@ public class ProjectEntityService
         return repository.findAll(pageable);
     }
 
+    public List<ProjectEntity> searchForAssistant(String assistantName) {return repository.searchForAssistant(assistantName);}
+
+    public List<ProjectEntity> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
+
     public int count() {
         return (int) repository.count();
     }
 
+    public int exists(ProjectEntity projectEntity)
+    {
+        int exists=0;
+
+        ProjectEntity tempProjectEntity = repository.findByTitle(projectEntity.getTitle());
+        if (tempProjectEntity != null)
+        {
+            exists+=1;
+        }
+        return exists;
+    }
 }

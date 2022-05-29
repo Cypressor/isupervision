@@ -12,8 +12,6 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.security.RolesAllowed;
 
-
-
 @PageTitle("Account Studenten")
 @Route(value = "account/student", layout = MainLayout.class)
 @RolesAllowed("STUDENT")
@@ -25,7 +23,6 @@ public class AccountStudentenView extends VerticalLayout
     @Autowired
     public AccountStudentenView(AuthenticatedUser authenticatedUser, StudentService studentService )
     {
-
         student = studentService.get(authenticatedUser.get().get().getUsername());
         createProjectBox();
 
@@ -51,9 +48,7 @@ public class AccountStudentenView extends VerticalLayout
                 Notification.show("Hochwertigste Arbeit: Masterarbeit. Level wurde auf 3 gesetzt");
             }
         studentService.update(student);
-
         });
-
     }
 
     private void createProjectBox()

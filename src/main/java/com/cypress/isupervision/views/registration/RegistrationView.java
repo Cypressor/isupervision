@@ -26,18 +26,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @PageTitle("Login")
 @Route(value = "register")
 @AnonymousAllowed
-public class RegistrationView extends VerticalLayout implements BeforeEnterObserver
+public class RegistrationView extends VerticalLayout
 {
-
     final String ROLE_STUDENT = "Student";
     final String ROLE_ASSISTENT = "Assistent";
     final String KEY_STUDENT = "FH02student";
     final String KEY_ASSISTENT = "FH02assistent";
-
     private BeanValidationBinder<User> userBinder;
     private Student student;
     private Assistant assistant;
-
     private TextField username = new TextField("Benutzername");
     private TextField firstname = new TextField("Vorname");
     private TextField lastname = new TextField("Nachname");
@@ -48,11 +45,8 @@ public class RegistrationView extends VerticalLayout implements BeforeEnterObser
     private ComboBox<String> role = new ComboBox("Rolle");
     private Button registerButton = new Button ("Registrieren");
 
-
     RegistrationView(StudentService studentService, AssistantService assistantService, UserService userService, PasswordEncoder passwordEncoder)
     {
-
-
         createRegistrationForm();
 
         // Configure Form
@@ -81,7 +75,6 @@ public class RegistrationView extends VerticalLayout implements BeforeEnterObser
                     if (role.getValue().trim().equals("Student") && key.getValue().equals(KEY_STUDENT))
                     {
                         this.student = new Student();
-
                         userBinder.writeBean(this.student);
                         this.student.setPassword(password1.getValue());
                         int exists = userService.exists(this.student);
@@ -105,7 +98,6 @@ public class RegistrationView extends VerticalLayout implements BeforeEnterObser
                     else if (role.getValue().equals("Assistent") && key.getValue().equals(KEY_ASSISTENT))
                     {
                         this.assistant = new Assistant();
-
                         userBinder.writeBean(this.assistant);
                         this.assistant.setPassword(password1.getValue());
                         int exists = userService.exists(this.assistant);
@@ -132,18 +124,10 @@ public class RegistrationView extends VerticalLayout implements BeforeEnterObser
                     }
                 }
             }
-
             catch (ValidationException validationException) {
                 Notification.show("Es ist leider etwas schief gegangen.");
             }
-
         });
-    }
-
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent)
-    {
-
     }
 
     private void clearForm() {

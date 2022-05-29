@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Table(name = "application_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"username","email"})})
 public class User extends AbstractEntity
 {
-
     private String username;
     private String firstname;
     private String lastname;
@@ -65,5 +64,4 @@ public class User extends AbstractEntity
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
     }
-
 }

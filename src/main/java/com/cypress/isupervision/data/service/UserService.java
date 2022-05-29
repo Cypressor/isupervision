@@ -52,7 +52,6 @@ public class UserService {
         {
             exists+=2;
         }
-
         return exists;
     }
 

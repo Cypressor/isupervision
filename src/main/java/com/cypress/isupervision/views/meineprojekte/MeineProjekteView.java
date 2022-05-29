@@ -1,45 +1,89 @@
 package com.cypress.isupervision.views.meineprojekte;
 
+import com.cypress.isupervision.data.entity.project.BachelorsThesis;
 import com.cypress.isupervision.data.entity.project.MastersThesis;
-import com.cypress.isupervision.data.entity.project.ProjectEntity;
-import com.cypress.isupervision.data.service.MastersThesisService;
-import com.cypress.isupervision.data.service.ProjectEntityService;
+import com.cypress.isupervision.data.entity.project.Project;
+import com.cypress.isupervision.data.service.*;
+import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 import javax.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+
 
 @PageTitle("Meine Projekte")
-@Route(value = "myprojects/:projectEntityID?/:action?(edit)", layout = MainLayout.class)
-@AnonymousAllowed
-public class MeineProjekteView extends Div implements BeforeEnterObserver {
+@Route(value = "myprojects", layout = MainLayout.class)
+@PermitAll
+public class MeineProjekteView extends Div
+{
+    private Grid<MastersThesis> grid = new Grid<>(MastersThesis.class, false);
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent)
+    private MastersThesis mastersThesis;
+    AuthenticatedUser authenticatedUser;
+    List<Project> projects;
+    List<Project> projects2;
+    List<BachelorsThesis> bachelorsTheses;
+    List<BachelorsThesis> bachelorsTheses2;
+    List<MastersThesis> mastersTheses;
+    List<MastersThesis> mastersTheses2;
+
+@Autowired
+    public MeineProjekteView(AuthenticatedUser authenticatedUser, ProjectService projectService, BachelorsThesisService bachelorsThesisService, MastersThesisService mastersThesisService)
+{
+        this.authenticatedUser=authenticatedUser;
+        addClassNames("meine-projekte-view");
+
+    projects=projectService.searchForAssistant(authenticatedUser.get().get().getFirstname()+ " " + authenticatedUser.get().get().getLastname());
+    projects2=projectService.searchForStudent(authenticatedUser.get().get().getFirstname()+ " " + authenticatedUser.get().get().getLastname());
+    bachelorsTheses=bachelorsThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname()+ " " + authenticatedUser.get().get().getLastname());
+    bachelorsTheses2=bachelorsThesisService.searchForStudent(authenticatedUser.get().get().getFirstname()+ " " + authenticatedUser.get().get().getLastname());
+    mastersTheses=mastersThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname()+ " " + authenticatedUser.get().get().getLastname());
+    mastersTheses2=mastersThesisService.searchForStudent(authenticatedUser.get().get().getFirstname()+ " " + authenticatedUser.get().get().getLastname());
+    projects.addAll(projects2);
+    bachelorsTheses.addAll(bachelorsTheses2);
+    mastersTheses.addAll(mastersTheses2);
+
+    for(Project p : projects)
     {
+        mastersThesis = new MastersThesis();
+        mastersThesis.setTitle(p.getTitle());
+        mastersThesis.setAssistant(p.getAssistant());
+        mastersThesis.setStudent(p.getStudent());
+        mastersThesis.setDeadline(p.getDeadline());
+        mastersTheses.add(mastersThesis);
+    }
+    for(BachelorsThesis b : bachelorsTheses)
+    {
+        mastersThesis = new MastersThesis();
+        mastersThesis.setTitle(b.getTitle());
+        mastersThesis.setAssistant(b.getAssistant());
+        mastersThesis.setStudent(b.getStudent());
+        mastersThesis.setDeadline(b.getDeadline());
+        mastersTheses.add(mastersThesis);
+    }
+    configureGrid();
+    add(grid);
+    grid.setItems(mastersTheses);
+    }
 
+    private void configureGrid()
+    {
+        grid.addColumn("title").setWidth("800px");
+        grid.addColumn("assistant").setAutoWidth(true);
+        grid.addColumn("student").setAutoWidth(true);
+        grid.addColumn("deadline").setAutoWidth(true);
+        grid.addColumn("examDate").setAutoWidth(true);
+
+        grid.getColumnByKey("title").setHeader("Titel");
+        grid.getColumnByKey("assistant").setHeader("Assistent");
+        grid.getColumnByKey("student").setHeader("Student");
+        grid.getColumnByKey("deadline").setHeader("Deadline");
+        grid.getColumnByKey("examDate").setHeader("Prüfungstermin");
     }
 }
+
+

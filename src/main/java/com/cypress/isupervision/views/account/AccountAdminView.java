@@ -35,7 +35,6 @@ public class AccountAdminView extends VerticalLayout
             admin.setProjLimit(Integer.parseInt(projLimit.getValue()));
             admin.setBaLimit(Integer.parseInt(baLimit.getValue()));
             admin.setMaLimit(Integer.parseInt(maLimit.getValue()));
-
             administratorService.update(admin);
             Notification.show("Änderungen an den Limits gespeichert.");
         });

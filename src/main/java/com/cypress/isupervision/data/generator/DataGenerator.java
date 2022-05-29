@@ -29,7 +29,6 @@ public class DataGenerator {
                                       MastersThesisRepository mastersThesisRepository, StudentRepository studentRepository,
                                       AssistantRepository assistantRepository, AdministratorRepository administratorRepository) {
         return args -> {
-
             Logger logger = LoggerFactory.getLogger(getClass());
             if (userRepository.count() != 0L) {
                 logger.info("Using existing database");
@@ -65,7 +64,7 @@ public class DataGenerator {
             assistant.setPassword("testassistantpw");
             assistant.setHashedPassword(passwordEncoder.encode(assistant.getPassword()));
             assistant.setProfilePictureUrl(
-                    "https://m.media-amazon.com/images/I/51KjmiRrsYL._AC_.jpg");
+                    "https://upload.wikimedia.org/wikipedia/commons/f/f8/Burt_Ward_Robin.jpg");
             student.setRoles(Collections.singleton(Role.ASSISTANT));
             assistantRepository.save(assistant);
 
@@ -92,7 +91,6 @@ public class DataGenerator {
             studentRepositoryGenerator.setData(Student::setLastname, DataType.LAST_NAME);
             studentRepositoryGenerator.setData(Student::setEmail, DataType.EMAIL);
             studentRepositoryGenerator.setData(Student::setPassword, DataType.TWO_WORDS);
-            studentRepositoryGenerator.setData(Student::setProfilePictureUrl, DataType.PROFILE_PICTURE_URL);
             students=studentRepositoryGenerator.create(20, seed);
             for (int i=0; i<students.size();i++)
             {
@@ -110,12 +108,10 @@ public class DataGenerator {
             seed = 234;
             ExampleDataGenerator<Assistant> assistantRepositoryGenerator = new ExampleDataGenerator<>(Assistant.class,
                     LocalDateTime.of(2022, 5, 24, 0, 0, 0));
-
             assistantRepositoryGenerator.setData(Assistant::setFirstname, DataType.FIRST_NAME);
             assistantRepositoryGenerator.setData(Assistant::setLastname, DataType.LAST_NAME);
             assistantRepositoryGenerator.setData(Assistant::setEmail, DataType.EMAIL);
             assistantRepositoryGenerator.setData(Assistant::setPassword, DataType.TWO_WORDS);
-            assistantRepositoryGenerator.setData(Assistant::setProfilePictureUrl, DataType.PROFILE_PICTURE_URL);
             assistants=assistantRepositoryGenerator.create(5, seed);
             for (int i=0; i<assistants.size();i++)
             {
@@ -178,7 +174,6 @@ public class DataGenerator {
                     MastersThesis.class, LocalDateTime.of(2022, 5, 24, 0, 0, 0));
             masterarbeitRepositoryGenerator.setData(MastersThesis::setTitle, DataType.SENTENCE);
             masterarbeitRepositoryGenerator.setData(MastersThesis::setDeadline, DataType.DATE_NEXT_1_YEAR);
-            masterarbeitRepositoryGenerator.setData(MastersThesis::setExamDate, DataType.DATE_NEXT_1_YEAR);
             mastersTheses= masterarbeitRepositoryGenerator.create(25, seed);
             for (int i=0; i<projects.size();i++)
             {

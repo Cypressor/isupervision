@@ -39,5 +39,4 @@ public class AssistantService {
     public int count() {
         return (int) repository.count();
     }
-
 }

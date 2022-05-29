@@ -17,7 +17,7 @@ public class Assistant extends User {
         this.projLimit=1000;
         this.baLimit=1000;
         this.maLimit=1000;
-        this.setProfilePictureUrl("https://m.media-amazon.com/images/I/51KjmiRrsYL._AC_.jpg");
+        this.setProfilePictureUrl("https://upload.wikimedia.org/wikipedia/commons/f/f8/Burt_Ward_Robin.jpg");
     }
 
     public Integer getProjLimit() {
@@ -38,5 +38,4 @@ public class Assistant extends User {
     public void setMaLimit(Integer maLimit) {
         this.maLimit = maLimit;
     }
-
 }

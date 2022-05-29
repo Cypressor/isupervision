@@ -1,9 +1,7 @@
 package com.cypress.isupervision.views.account;
-
 import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +14,15 @@ import java.util.Set;
 @RouteAlias(value="", layout = MainLayout.class)
 public class AccountView extends VerticalLayout implements BeforeEnterObserver
 {
-
     private String role="";
 
 private AuthenticatedUser authenticatedUser;
 
     @Autowired
-    public AccountView(AuthenticatedUser authenticatedUser) {
-
+    public AccountView(AuthenticatedUser authenticatedUser)
+    {
         this.authenticatedUser=authenticatedUser;
         getUserRole();
-
     }
 
     @Override
@@ -34,8 +30,8 @@ private AuthenticatedUser authenticatedUser;
     {
         getUserRole();
         redirect(event);
-
     }
+
     private void getUserRole()
     {
         Set<Role> roles = authenticatedUser.get().get().getRoles();
@@ -54,8 +50,8 @@ private AuthenticatedUser authenticatedUser;
                 role="Student";
             }
         }
-
     }
+
     private void redirect(BeforeEnterEvent event)
     {
         if (this.role.equals("Admin"))
@@ -71,5 +67,4 @@ private AuthenticatedUser authenticatedUser;
             event.rerouteTo(AccountAssistentenView.class);
         }
     }
-
 }

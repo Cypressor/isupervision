@@ -41,5 +41,4 @@ public class Administrator extends User {
     public void setMaLimit(Integer maLimit) {
         this.maLimit = maLimit;
     }
-
 }

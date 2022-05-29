@@ -1,4 +1,5 @@
 package com.cypress.isupervision.views.assistenten;
+
 import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.UserService;
@@ -57,9 +58,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
     private Button edit = new Button("Ändern");
 
     private BeanValidationBinder<Assistant> binder;
-
     private Assistant assistant;
-
     private final AssistantService assistantService;
 
     @Autowired
@@ -69,10 +68,8 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
-
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
-
         add(splitLayout);
 
         // Configure Grid
@@ -119,19 +116,18 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
                 .bind("baLimit");
         binder.forField(maLimit).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
                 .bind("maLimit");
-
         binder.bindInstanceFields(this);
 
+        //Hook up Cancel Button
         cancel.addClickListener(e -> {
             clearForm();
             refreshGrid();
         });
 
+        //Hook up Save Button
         save.addClickListener(e -> {
             try {
-
                 this.assistant = new Assistant();
-
                 binder.writeBean(this.assistant);
 
                 if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || projLimit.getValue().trim().equals("") || baLimit.getValue().trim().equals("")  || maLimit.getValue().trim().equals(""))
@@ -170,12 +166,14 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
             }
         });
 
+        //Hook up Delete Button
         delete.addClickListener(e -> {
             binder.readBean(this.assistant);
             assistantService.delete(this.assistant.getId());
             refreshGrid();
         });
 
+        //Hook up Edit Button
         edit.addClickListener(e-> {
             try
             {
@@ -194,13 +192,10 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
                         Notification.show("Assistent wurde bearbeitet.");
                     }
                 }
-
                 UI.getCurrent().navigate(AssistentenView.class);
             } catch (ValidationException validationException) {
                 Notification.show("Es ist leider etwas schief gegangen.");
             }});
-
-
     }
 
     @Override
@@ -224,7 +219,6 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
     private void createEditorLayout(SplitLayout splitLayout) {
         Div editorLayoutDiv = new Div();
         editorLayoutDiv.setClassName("editor-layout");
-
         Div editorDiv = new Div();
         editorDiv.setClassName("editor");
         editorLayoutDiv.add(editorDiv);
@@ -243,7 +237,6 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         formLayout.add(fields);
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
-
         splitLayout.addToSecondary(editorLayoutDiv);
     }
 
@@ -285,6 +278,5 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
     private void populateForm(Assistant value) {
         this.assistant = value;
         binder.readBean(this.assistant);
-
     }
 }

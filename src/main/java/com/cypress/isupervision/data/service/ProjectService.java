@@ -1,17 +1,16 @@
 package com.cypress.isupervision.data.service;
 
 import com.cypress.isupervision.data.entity.project.Project;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.cypress.isupervision.data.entity.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProjectService {
+public class ProjectService  {
 
     private final ProjectRepository repository;
 
@@ -27,6 +26,10 @@ public class ProjectService {
     public Project update(Project entity) {
         return repository.save(entity);
     }
+
+    public List<Project> searchForAssistant(String assistantName) {return repository.searchForAssistant(assistantName);}
+
+    public List<Project> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
 
     public void delete(UUID id) {
         repository.deleteById(id);

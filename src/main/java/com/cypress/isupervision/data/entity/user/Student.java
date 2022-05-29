@@ -15,12 +15,10 @@ public class Student extends User {
         this.level=0;
         this.setProfilePictureUrl("https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F13%2F2016%2F06%2F03%2Fron.jpg&q=60");
     }
-
     public Integer getLevel() {
         return level;
     }
     public void setLevel(Integer level) {
         this.level = level;
     }
-
 }

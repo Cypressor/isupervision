@@ -1,8 +1,8 @@
-package com.cypress.isupervision.views.projekte;
+package com.cypress.isupervision.views.bachelorarbeiten;
 
-import com.cypress.isupervision.data.entity.project.Project;
+import com.cypress.isupervision.data.entity.project.BachelorsThesis;
+import com.cypress.isupervision.data.service.BachelorsThesisService;
 import com.cypress.isupervision.data.service.ProjectEntityService;
-import com.cypress.isupervision.data.service.ProjectService;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -32,15 +32,16 @@ import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 
-@PageTitle("Projekte Assistenten")
-@Route(value = "projects/assistant/:projectID?/:action?(edit)", layout = MainLayout.class)
+@PageTitle("Bachelorarbeiten Assistenten")
+@Route(value = "bachelorsthesis/assistant/:bachelorsthesisID?/:action?(edit)", layout = MainLayout.class)
 @RolesAllowed({"ASSISTANT", "ADMIN"})
-public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
+public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterObserver
 {
-    private final String PROJECT_ID = "projectID";
-    private final String PROJECT_EDIT_ROUTE_TEMPLATE = "projects/assistant/%s/edit";
-    private final ProjectService projectService;
-    private Grid<Project> grid = new Grid<>(Project.class, false);
+    private final String BACHELORSTHESIS_ID = "bachelorsthesisID";
+    private final String BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE = "bachelorsthesis/assistant/%s/edit";
+    private final BachelorsThesisService bachelorsThesisService;
+    private AuthenticatedUser authenticatedUser;
+    private Grid<BachelorsThesis> grid = new Grid<>(BachelorsThesis.class, false);
     private TextField title;
     private TextField assistant;
     private TextField student;
@@ -49,15 +50,14 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private Button save = new Button("Speichern");
     private Button delete = new Button("Löschen");
     private Button edit = new Button("Ändern");
-    private BeanValidationBinder<Project> binder;
-    private Project project;
-    private AuthenticatedUser authenticatedUser;
+    private BeanValidationBinder<BachelorsThesis> binder;
+    private BachelorsThesis bachelorsThesis;
 
-    public ProjekteAssistentenView(AuthenticatedUser authenticatedUser, ProjectService projectService, ProjectEntityService projectEntityService)
+    public BachelorarbeitenAssistentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService)
     {
+        this.bachelorsThesisService = bachelorsThesisService;
         this.authenticatedUser = authenticatedUser;
-        this.projectService = projectService;
-        addClassNames("projekte-view");
+        addClassNames("bachelorarbeiten-view");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -76,7 +76,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         grid.getColumnByKey("student").setHeader("Student");
         grid.getColumnByKey("deadline").setHeader("Deadline");
 
-        grid.setItems(query -> projectService.list(
+        grid.setItems(query -> bachelorsThesisService.list(
                         PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -86,17 +86,17 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         {
             if (event.getValue() != null)
             {
-                UI.getCurrent().navigate(String.format(PROJECT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(String.format(BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
             } else
             {
                 clearForm();
-                UI.getCurrent().navigate(ProjekteAssistentenView.class);
+                UI.getCurrent().navigate(BachelorarbeitenAssistentenView.class);
             }
         });
         fillAssistantField();
 
         // Configure Form
-        binder = new BeanValidationBinder<>(Project.class);
+        binder = new BeanValidationBinder<>(BachelorsThesis.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
         binder.bindInstanceFields(this);
@@ -113,9 +113,8 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         {
             try
             {
-                this.project = new Project();
-                binder.writeBean(this.project);
-
+                this.bachelorsThesis = new BachelorsThesis();
+                binder.writeBean(this.bachelorsThesis);
                 if (title.getValue().trim().equals(""))
                 {
                     Notification.show("Bitte Titel eintragen.");
@@ -136,15 +135,15 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                 {
                     if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
                     {
-                        if (this.project != null)
+                        if (this.bachelorsThesis != null)
                         {
-                            int exists = projectEntityService.exists(this.project);
+                            int exists = projectEntityService.exists(this.bachelorsThesis);
                             if (exists == 0)
                             {
-                                projectService.update(this.project);
+                                bachelorsThesisService.update(this.bachelorsThesis);
                                 clearForm();
                                 refreshGrid();
-                                Notification.show("Projekt gespeichert.");
+                                Notification.show("Bachelorarbeit gespeichert.");
                             } else
                             {
                                 Notification.show("Titel existiert bereits.");
@@ -153,9 +152,9 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                     }
                 } else
                 {
-                    Notification.show("Assistenten dürfen nur Projekte auf ihren eigenen Namen buchen.");
+                    Notification.show("Assistenten dürfen nur Bachelorarbeiten auf ihren eigenen Namen buchen.");
                 }
-                UI.getCurrent().navigate(ProjekteAssistentenView.class);
+                UI.getCurrent().navigate(BachelorarbeitenAssistentenView.class);
             } catch (ValidationException validationException)
             {
                 Notification.show("Es ist leider etwas schief gegangen.");
@@ -165,14 +164,15 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         //Hook up Delete Button
         delete.addClickListener(e ->
         {
-            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.project.getAssistant()))
+            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.bachelorsThesis.getAssistant()))
             {
-                binder.readBean(this.project);
-                projectService.delete(this.project.getId());
-                refreshGrid();
-            } else
+            binder.readBean(this.bachelorsThesis);
+            bachelorsThesisService.delete(this.bachelorsThesis.getId());
+            refreshGrid();
+            }
+            else
             {
-                Notification.show("Assistenten dürfen ihre eigenen Projekte löschen.");
+                Notification.show("Assistenten dürfen nur ihre eigenen Bachelorarbeiten löschen.");
             }
         });
 
@@ -181,11 +181,11 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         {
             try
             {
-                if (this.project != null)
+                if (this.bachelorsThesis != null)
                 {
-                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.project.getAssistant()))
+                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.bachelorsThesis.getAssistant()))
                     {
-                        binder.writeBean(this.project);
+                        binder.writeBean(this.bachelorsThesis);
                         if (title.getValue().trim().equals(""))
                         {
                             Notification.show("Bitte Titel eintragen.");
@@ -206,24 +206,24 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                         {
                             if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
                             {
-                                projectService.update(this.project);
+                                bachelorsThesisService.update(this.bachelorsThesis);
                                 clearForm();
                                 refreshGrid();
-                                Notification.show("Projekt wurde bearbeitet.");
+                                Notification.show("Bachelorarbeit wurde bearbeitet.");
                             }
                         } else
                         {
-                            Notification.show("Assistenten dürfen nur Projekte auf ihren eigenen Namen eintragen.");
+                            Notification.show("Assistenten dürfen nur Bachelorarbeiten auf ihren eigenen Namen buchen.");
                         }
                     } else
                     {
-                        Notification.show("Assistenten dürfen nur ihre eigenen Projekte verändern.");
+                        Notification.show("Assistenten dürfen nur ihre eigenen Bachelorarbeiten verändern.");
                     }
                 } else
                 {
-                    Notification.show("Kein Projekt ausgewählt.");
+                    Notification.show("Keine Bachelorarbeit ausgewählt.");
                 }
-                UI.getCurrent().navigate(ProjekteAssistentenView.class);
+                UI.getCurrent().navigate(BachelorarbeitenAssistentenView.class);
             } catch (ValidationException validationException)
             {
                 Notification.show("Es ist leider etwas schief gegangen.");
@@ -234,21 +234,21 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     @Override
     public void beforeEnter(BeforeEnterEvent event)
     {
-        Optional<UUID> projektId = event.getRouteParameters().get(PROJECT_ID).map(UUID::fromString);
-        if (projektId.isPresent())
+        Optional<UUID> bachelorThesisId = event.getRouteParameters().get(BACHELORSTHESIS_ID).map(UUID::fromString);
+        if (bachelorThesisId.isPresent())
         {
-            Optional<Project> projektFromBackend = projectService.get(projektId.get());
-            if (projektFromBackend.isPresent())
+            Optional<BachelorsThesis> bachelorsThesisFromBackend = bachelorsThesisService.get(bachelorThesisId.get());
+            if (bachelorsThesisFromBackend.isPresent())
             {
-                populateForm(projektFromBackend.get());
+                populateForm(bachelorsThesisFromBackend.get());
             } else
             {
-                Notification.show(String.format("Projekt wurde nicht gefunden, ID = %s", projektId.get()), 3000,
+                Notification.show(String.format("Bachelorarbeit wurde nicht gefunden, ID = %s", bachelorThesisId.get()), 3000,
                         Notification.Position.BOTTOM_START);
                 // when a row is selected but the data is no longer available,
                 // refresh grid
                 refreshGrid();
-                event.forwardTo(ProjekteAssistentenView.class);
+                event.forwardTo(BachelorarbeitenAssistentenView.class);
             }
         }
     }
@@ -314,10 +314,10 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         fillAssistantField();
     }
 
-    private void populateForm(Project value)
+    private void populateForm(BachelorsThesis value)
     {
-        this.project = value;
-        binder.readBean(this.project);
+        this.bachelorsThesis = value;
+        binder.readBean(this.bachelorsThesis);
     }
 
     private void fillAssistantField()

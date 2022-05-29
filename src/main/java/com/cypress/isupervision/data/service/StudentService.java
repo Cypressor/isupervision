@@ -1,6 +1,5 @@
 package com.cypress.isupervision.data.service;
 
-
 import com.cypress.isupervision.data.entity.user.Student;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,16 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StudentService {
+public class StudentService
+{
 
     private final StudentRepository repository;
-
-
 
     @Autowired
     public StudentService(StudentRepository repository) {
         this.repository = repository;
-
     }
 
     public Optional<Student> get(UUID id) {
@@ -58,7 +55,6 @@ public class StudentService {
         {
             exists+=2;
         }
-
         return exists;
     }
 

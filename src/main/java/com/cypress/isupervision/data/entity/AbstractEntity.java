@@ -48,6 +48,5 @@ public abstract class AbstractEntity {
     @PostPersist
     public void postPersist()
     {
-
     }
 }

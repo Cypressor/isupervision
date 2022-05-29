@@ -35,12 +35,10 @@ public class AccountAssistentenView extends VerticalLayout
             assistant.setProjLimit(Integer.parseInt(projLimit.getValue()));
             assistant.setBaLimit(Integer.parseInt(baLimit.getValue()));
             assistant.setMaLimit(Integer.parseInt(maLimit.getValue()));
-
             assistantService.update(assistant);
             Notification.show("Änderungen an den Limits gespeichert.");
         });
     }
-
 
     private void createLayout()
     {
@@ -51,5 +49,4 @@ public class AccountAssistentenView extends VerticalLayout
         maLimit.setValue(assistant.getMaLimit().toString());
         add(fieldLayout);
     }
-
 }

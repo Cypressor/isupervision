@@ -24,8 +24,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver
     {
         createLoginComponent();
         setAlignItems(Alignment.CENTER);
-
     }
+
     public void createLoginComponent()
     {
         addClassNames("login");
@@ -39,7 +39,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver
         add(loginForm);
         add(new RouterLink("Registrierung", RegistrationView.class));
     }
-
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent)
