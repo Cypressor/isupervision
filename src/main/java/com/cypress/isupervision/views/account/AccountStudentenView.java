@@ -14,7 +14,7 @@ import javax.annotation.security.RolesAllowed;
 
 
 
-@PageTitle("AccountStudent")
+@PageTitle("Account Studenten")
 @Route(value = "account/student", layout = MainLayout.class)
 @RolesAllowed("STUDENT")
 public class AccountStudentenView extends VerticalLayout

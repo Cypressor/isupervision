@@ -29,6 +29,7 @@ public class DataGenerator {
                                       MastersThesisRepository mastersThesisRepository, StudentRepository studentRepository,
                                       AssistantRepository assistantRepository, AdministratorRepository administratorRepository) {
         return args -> {
+
             Logger logger = LoggerFactory.getLogger(getClass());
             if (userRepository.count() != 0L) {
                 logger.info("Using existing database");
@@ -49,7 +50,7 @@ public class DataGenerator {
             student.setPassword("teststudentpw");
             student.setHashedPassword(passwordEncoder.encode(student.getPassword()));
             student.setProfilePictureUrl(
-                    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
+                    "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F13%2F2016%2F06%2F03%2Fron.jpg&q=60");
             student.setRoles(Collections.singleton(Role.STUDENT));
             studentRepository.save(student);
 
@@ -64,7 +65,7 @@ public class DataGenerator {
             assistant.setPassword("testassistantpw");
             assistant.setHashedPassword(passwordEncoder.encode(assistant.getPassword()));
             assistant.setProfilePictureUrl(
-                    "https://t3.ftcdn.net/jpg/02/05/76/62/240_F_205766203_bGiVmoVpbipIAAM3CWL84FWbROgSIcik.jpg");
+                    "https://m.media-amazon.com/images/I/51KjmiRrsYL._AC_.jpg");
             student.setRoles(Collections.singleton(Role.ASSISTANT));
             assistantRepository.save(assistant);
 
@@ -78,7 +79,7 @@ public class DataGenerator {
             admin.setPassword("verysecureadminpw");
             admin.setHashedPassword(passwordEncoder.encode(admin.getPassword()));
             admin.setProfilePictureUrl(
-                    "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
+                    "https://breakingmuscle.com/wp-content/uploads/2015/01/biceplevisquare.png");
             administratorRepository.save(admin);
 
 
@@ -114,6 +115,7 @@ public class DataGenerator {
             assistantRepositoryGenerator.setData(Assistant::setLastname, DataType.LAST_NAME);
             assistantRepositoryGenerator.setData(Assistant::setEmail, DataType.EMAIL);
             assistantRepositoryGenerator.setData(Assistant::setPassword, DataType.TWO_WORDS);
+            assistantRepositoryGenerator.setData(Assistant::setProfilePictureUrl, DataType.PROFILE_PICTURE_URL);
             assistants=assistantRepositoryGenerator.create(5, seed);
             for (int i=0; i<assistants.size();i++)
             {

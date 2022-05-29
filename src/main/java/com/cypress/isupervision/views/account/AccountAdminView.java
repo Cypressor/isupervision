@@ -13,7 +13,7 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.security.RolesAllowed;
 
-@PageTitle("AccountAdmin")
+@PageTitle("Account Admin")
 @Route(value = "account/admin", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 public class AccountAdminView extends VerticalLayout

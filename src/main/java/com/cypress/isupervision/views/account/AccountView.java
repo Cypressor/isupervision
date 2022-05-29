@@ -70,7 +70,6 @@ private AuthenticatedUser authenticatedUser;
         {
             event.rerouteTo(AccountAssistentenView.class);
         }
-        Notification.show(role);
     }
 
 }

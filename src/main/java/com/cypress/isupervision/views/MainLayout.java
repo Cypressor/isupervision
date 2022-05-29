@@ -12,6 +12,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.Anchor;
@@ -100,7 +101,7 @@ public class MainLayout extends AppLayout {
             User user = maybeUser.get();
 
             Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
-            avatar.addClassNames("me-xs");
+            avatar.addThemeVariants(AvatarVariant.LUMO_XLARGE);
 
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
@@ -112,7 +113,7 @@ public class MainLayout extends AppLayout {
             });
 
             Span name = new Span(user.getUsername());
-            name.addClassNames("font-medium", "text-s", "text-secondary");
+            name.addClassNames("font-large", "text-l", "text-secondary");
 
             layout.add(avatar, name);
         } else {

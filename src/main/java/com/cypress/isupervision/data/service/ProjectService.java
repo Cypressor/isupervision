@@ -3,6 +3,8 @@ package com.cypress.isupervision.data.service;
 import com.cypress.isupervision.data.entity.project.Project;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.cypress.isupervision.data.entity.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,18 @@ public class ProjectService {
 
     public int count() {
         return (int) repository.count();
+    }
+
+    public int exists(Project project)
+    {
+        int exists=0;
+
+        Project tempProject = repository.findByTitle(project.getTitle());
+        if (tempProject != null)
+        {
+            exists+=1;
+        }
+        return exists;
     }
 
 }

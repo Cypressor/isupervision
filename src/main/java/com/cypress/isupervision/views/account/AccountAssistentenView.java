@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.RolesAllowed;
 
-@PageTitle("AccountAssistant")
+@PageTitle("Account Assistenten")
 @Route(value = "account/assistant", layout = MainLayout.class)
 @RolesAllowed("ASSISTANT")
 public class AccountAssistentenView extends VerticalLayout

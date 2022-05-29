@@ -124,9 +124,9 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-            //    if (this.student == null) {
+
                     this.student = new Student();
-            //    }
+
                 binder.writeBean(this.student);
 
                 if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || level.getValue().trim().equals(""))

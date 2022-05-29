@@ -17,6 +17,7 @@ public class Assistant extends User {
         this.projLimit=1000;
         this.baLimit=1000;
         this.maLimit=1000;
+        this.setProfilePictureUrl("https://m.media-amazon.com/images/I/51KjmiRrsYL._AC_.jpg");
     }
 
     public Integer getProjLimit() {
