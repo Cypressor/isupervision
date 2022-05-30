@@ -76,7 +76,8 @@ lvl3: masters thesis done
 - password: teststudentpw
 ### Additional users:
 If you want to take a look at additional test user data, log in with admin account and look at the "Studenten"/"Assistenten" tabs.
-
+The unhashed passwords are intentionally stored and shown in the "Studenten"/"Assistenten" view, just to make testing easier.
+I am totally aware that this shouldn't be the case in any proper application.
 ***
 ## Comments:
 
@@ -91,3 +92,7 @@ The Project-Entities could have been done alot better. (For example: ProjectEnti
 
 ### Regarding classes in general:
 There is quite alot of code repetition throughout the entire project. The code could be easily simplified by Implementing some more classes and interfaces. Again, there was a time issue.
+
+### Unhashed passwords being stored:
+The unhashed passwords are intentionally stored and shown in the "Studenten"/"Assistenten" view, just to make testing easier.
+I am totally aware that this shouldn't be the case in any proper application.
