@@ -74,7 +74,7 @@ public class MasterarbeitenStudentenView extends Div
                         }
                         else
                         {
-                            Notification.show("Sie können sich nicht für eine Bachelorarbeit anmelden, da Sie noch kein Projekt abgeschlossen haben");
+                            Notification.show("Sie können sich nicht für eine Masterarbeit anmelden, da Sie noch keine Bachelorarbeit abgeschlossen haben");
                         }
                     }
                 }
