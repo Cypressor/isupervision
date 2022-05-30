@@ -1,6 +1,7 @@
 package com.cypress.isupervision.views.bachelorarbeiten;
 
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
+import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.BachelorsThesisService;
 import com.cypress.isupervision.data.service.ProjectEntityService;
 import com.cypress.isupervision.security.AuthenticatedUser;
@@ -30,6 +31,8 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
@@ -56,8 +59,10 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
     private BeanValidationBinder<BachelorsThesis> binder;
     private BachelorsThesis bachelorsThesis;
     private Dialog warning = new Dialog();
+    private List<BachelorsThesis> bachelorsTheses;
+    private int limit;
 
-    public BachelorarbeitenAssistentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService)
+    public BachelorarbeitenAssistentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService, AssistantService assistantService)
     {
         this.bachelorsThesisService = bachelorsThesisService;
         this.authenticatedUser = authenticatedUser;
@@ -145,10 +150,19 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                             int exists = projectEntityService.exists(this.bachelorsThesis);
                             if (exists == 0)
                             {
-                                bachelorsThesisService.update(this.bachelorsThesis);
-                                clearForm();
-                                refreshGrid();
-                                Notification.show("Bachelorarbeit gespeichert.");
+                                bachelorsTheses=bachelorsThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+                                limit=assistantService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
+                                if (bachelorsTheses.size()<limit)
+                                {
+                                    bachelorsThesisService.update(this.bachelorsThesis);
+                                    clearForm();
+                                    refreshGrid();
+                                    Notification.show("Bachelorarbeit gespeichert.");
+                                }
+                                else
+                                {
+                                    Notification.show("Ihr Limit an Bachelorarbeiten ist bereits erreicht.");
+                                }
                             } else
                             {
                                 Notification.show("Titel existiert bereits.");

@@ -1,6 +1,7 @@
 package com.cypress.isupervision.views.projekte;
 
 import com.cypress.isupervision.data.entity.project.Project;
+import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.ProjectEntityService;
 import com.cypress.isupervision.data.service.ProjectService;
 import com.cypress.isupervision.security.AuthenticatedUser;
@@ -30,6 +31,8 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
@@ -56,8 +59,10 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private Project project;
     private AuthenticatedUser authenticatedUser;
     private Dialog warning = new Dialog();
+    private List<Project> projects;
+    private int limit;
 
-    public ProjekteAssistentenView(AuthenticatedUser authenticatedUser, ProjectService projectService, ProjectEntityService projectEntityService)
+    public ProjekteAssistentenView(AuthenticatedUser authenticatedUser, ProjectService projectService, ProjectEntityService projectEntityService, AssistantService assistantService)
     {
         this.authenticatedUser = authenticatedUser;
         this.projectService = projectService;
@@ -146,10 +151,19 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                             int exists = projectEntityService.exists(this.project);
                             if (exists == 0)
                             {
+                                projects=projectService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+                                limit=assistantService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
+                                if (projects.size()<limit)
+                                {
                                 projectService.update(this.project);
                                 clearForm();
                                 refreshGrid();
                                 Notification.show("Projekt gespeichert.");
+                                }
+                                else
+                                {
+                                    Notification.show("Ihr Limit an Projekten ist bereits erreicht.");
+                                }
                             } else
                             {
                                 Notification.show("Titel existiert bereits.");

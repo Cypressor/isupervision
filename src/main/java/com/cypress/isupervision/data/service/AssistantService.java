@@ -26,7 +26,7 @@ public class AssistantService {
 
     public Assistant update(Assistant entity) {
         entity.setUsername(entity.getUsername().trim());
-        entity.setFirstname(entity.getLastname().trim());
+        entity.setFirstname(entity.getFirstname().trim());
         entity.setLastname(entity.getLastname().trim());
         return repository.save(entity);
     }

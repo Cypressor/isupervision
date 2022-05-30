@@ -18,11 +18,11 @@ public class AccountView extends VerticalLayout implements BeforeEnterObserver
 
 private AuthenticatedUser authenticatedUser;
 
-    @Autowired
+@Autowired
     public AccountView(AuthenticatedUser authenticatedUser)
     {
         this.authenticatedUser=authenticatedUser;
-        getUserRole();
+
     }
 
     @Override
