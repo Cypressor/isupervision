@@ -23,18 +23,16 @@ public class MeineProjekteView extends Div
     private Grid<MastersThesis> grid = new Grid<>(MastersThesis.class, false);
 
     private MastersThesis mastersThesis;
-    AuthenticatedUser authenticatedUser;
-    List<Project> projects;
-    List<Project> projects2;
-    List<BachelorsThesis> bachelorsTheses;
-    List<BachelorsThesis> bachelorsTheses2;
-    List<MastersThesis> mastersTheses;
-    List<MastersThesis> mastersTheses2;
+    private List<Project> projects;
+    private List<Project> projects2;
+    private List<BachelorsThesis> bachelorsTheses;
+    private List<BachelorsThesis> bachelorsTheses2;
+    private List<MastersThesis> mastersTheses;
+    private List<MastersThesis> mastersTheses2;
 
 @Autowired
     public MeineProjekteView(AuthenticatedUser authenticatedUser, ProjectService projectService, BachelorsThesisService bachelorsThesisService, MastersThesisService mastersThesisService)
 {
-        this.authenticatedUser=authenticatedUser;
         addClassNames("meine-projekte-view");
 
     projects=projectService.searchForAssistant(authenticatedUser.get().get().getFirstname()+ " " + authenticatedUser.get().get().getLastname());

@@ -53,7 +53,6 @@ public class AccountStudentenView extends VerticalLayout
 
     private void createProjectBox()
     {
-        VerticalLayout testLayout = new VerticalLayout();
         projectBox.setAllowCustomValue(false);
         projectBox.setPlaceholder("Rolle auswählen");
         projectBox.setItems("Kein Projekt", "Projekt", "Bachelorarbeit", "Masterarbeit");

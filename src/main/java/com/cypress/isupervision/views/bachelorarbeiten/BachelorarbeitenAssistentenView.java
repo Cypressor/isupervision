@@ -10,10 +10,13 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -52,6 +55,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
     private Button edit = new Button("Ändern");
     private BeanValidationBinder<BachelorsThesis> binder;
     private BachelorsThesis bachelorsThesis;
+    private Dialog warning = new Dialog();
 
     public BachelorarbeitenAssistentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService)
     {
@@ -63,6 +67,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         SplitLayout splitLayout = new SplitLayout();
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
+        createDialog();
         add(splitLayout);
 
         // Configure Grid
@@ -166,9 +171,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         {
             if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.bachelorsThesis.getAssistant()))
             {
-            binder.readBean(this.bachelorsThesis);
-            bachelorsThesisService.delete(this.bachelorsThesis.getId());
-            refreshGrid();
+                warning.open();
             }
             else
             {
@@ -292,6 +295,30 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         greaterButtonLayout.add(buttonLayout1, buttonLayout2);
         greaterButtonLayout.setVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         editorLayoutDiv.add(greaterButtonLayout);
+    }
+
+    private void createDialog()
+    {
+        warning.add(new H4("Löschen"));
+        warning.add(new Paragraph("Sind Sie sich sicher, dass Sie diese Bachelorarbeit löschen möchten?"));
+        Button delete = new Button("Löschen");
+        Button cancel = new Button("Abbrechen");
+        warning.add(delete, cancel);
+        delete.addClickListener(event -> {confirmDelete();});
+        cancel.addClickListener(event->{cancelDelete();});
+    }
+    private void confirmDelete()
+    {
+        binder.readBean(this.bachelorsThesis);
+        bachelorsThesisService.delete(this.bachelorsThesis.getId());
+        refreshGrid();
+        Notification.show("Bachelorarbeit wurde gelöscht.");
+        warning.close();
+    }
+    private void cancelDelete()
+    {
+        Notification.show("Löschen wurde abgebrochen.");
+        warning.close();
     }
 
     private void createGridLayout(SplitLayout splitLayout)

@@ -22,9 +22,13 @@ public class AdministratorService
         return repository.findById(id);
     }
 
-    public Administrator get(String username) { return repository.findByUsername(username); }
+    public Administrator get(String username) {
+        return repository.findByUsername(username); }
 
     public Administrator update(Administrator entity) {
+        entity.setUsername(entity.getUsername().trim());
+        entity.setFirstname(entity.getLastname().trim());
+        entity.setLastname(entity.getLastname().trim());
         return repository.save(entity);
     }
 

@@ -26,6 +26,9 @@ public class StudentService
     public Student get(String username) { return repository.findByUsername(username); }
 
     public Student update(Student entity) {
+        entity.setUsername(entity.getUsername().trim());
+        entity.setFirstname(entity.getLastname().trim());
+        entity.setLastname(entity.getLastname().trim());
         return repository.save(entity);
     }
 

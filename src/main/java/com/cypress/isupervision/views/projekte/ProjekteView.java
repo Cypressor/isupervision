@@ -1,7 +1,6 @@
 package com.cypress.isupervision.views.projekte;
 
 import com.cypress.isupervision.data.Role;
-
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;

@@ -23,7 +23,15 @@ public class ProjectEntityService
         return repository.findById(id);
     }
 
-    public ProjectEntity update(ProjectEntity entity) {return repository.save(entity);}
+    public ProjectEntity get(String title) {
+        return repository.findByTitle(title);
+    }
+
+    public ProjectEntity update(ProjectEntity entity) {
+        entity.setTitle(entity.getTitle().trim());
+        entity.setAssistant(entity.getAssistant().trim());
+        entity.setStudent(entity.getStudent().trim());
+        return repository.save(entity);}
 
     public void delete(UUID id) {
         repository.deleteById(id);

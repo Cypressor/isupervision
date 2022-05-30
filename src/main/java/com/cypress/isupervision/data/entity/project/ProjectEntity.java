@@ -1,7 +1,6 @@
 package com.cypress.isupervision.data.entity.project;
 
 import com.cypress.isupervision.data.entity.AbstractEntity;
-
 import javax.persistence.Entity;
 import java.time.LocalDate;
 

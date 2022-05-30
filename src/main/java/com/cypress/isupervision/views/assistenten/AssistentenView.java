@@ -8,10 +8,13 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -60,6 +63,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
     private BeanValidationBinder<Assistant> binder;
     private Assistant assistant;
     private final AssistantService assistantService;
+    private Dialog warning = new Dialog();
 
     @Autowired
     public AssistentenView(AssistantService assistantService, UserService userService) {
@@ -70,6 +74,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         SplitLayout splitLayout = new SplitLayout();
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
+        createDialog();
         add(splitLayout);
 
         // Configure Grid
@@ -168,9 +173,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
 
         //Hook up Delete Button
         delete.addClickListener(e -> {
-            binder.readBean(this.assistant);
-            assistantService.delete(this.assistant.getId());
-            refreshGrid();
+            warning.open();
         });
 
         //Hook up Edit Button
@@ -257,6 +260,30 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         greaterButtonLayout.add(buttonLayout1,buttonLayout2);
         greaterButtonLayout.setVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         editorLayoutDiv.add(greaterButtonLayout);
+    }
+
+    private void createDialog()
+    {
+        warning.add(new H4("Löschen"));
+        warning.add(new Paragraph("Sind Sie sich sicher, dass Sie diesen Assistenten löschen möchten?"));
+        Button delete = new Button("Löschen");
+        Button cancel = new Button("Abbrechen");
+        warning.add(delete, cancel);
+        delete.addClickListener(event -> {confirmDelete();});
+        cancel.addClickListener(event->{cancelDelete();});
+    }
+    private void confirmDelete()
+    {
+        binder.readBean(this.assistant);
+        assistantService.delete(this.assistant.getId());
+        refreshGrid();
+        Notification.show("Assistent wurde gelöscht.");
+        warning.close();
+    }
+    private void cancelDelete()
+    {
+        Notification.show("Löschen wurde abgebrochen.");
+        warning.close();
     }
 
     private void createGridLayout(SplitLayout splitLayout) {
