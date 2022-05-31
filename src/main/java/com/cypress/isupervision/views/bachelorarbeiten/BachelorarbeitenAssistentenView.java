@@ -1,6 +1,7 @@
 package com.cypress.isupervision.views.bachelorarbeiten;
 
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
+import com.cypress.isupervision.data.service.AdministratorService;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.BachelorsThesisService;
 import com.cypress.isupervision.data.service.ProjectEntityService;
@@ -62,7 +63,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
     private List<BachelorsThesis> bachelorsTheses;
     private int limit;
 
-    public BachelorarbeitenAssistentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService, AssistantService assistantService)
+    public BachelorarbeitenAssistentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService, AssistantService assistantService, AdministratorService administratorService)
     {
         this.bachelorsThesisService = bachelorsThesisService;
         this.authenticatedUser = authenticatedUser;
@@ -151,7 +152,15 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                             if (exists == 0)
                             {
                                 bachelorsTheses=bachelorsThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
-                                limit=assistantService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
+                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
+                                }
+                                else
+                                {
+                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
+                                }
                                 if (bachelorsTheses.size()<limit)
                                 {
                                     bachelorsThesisService.update(this.bachelorsThesis);

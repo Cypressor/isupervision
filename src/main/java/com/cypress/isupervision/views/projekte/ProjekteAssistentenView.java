@@ -1,6 +1,7 @@
 package com.cypress.isupervision.views.projekte;
 
 import com.cypress.isupervision.data.entity.project.Project;
+import com.cypress.isupervision.data.service.AdministratorService;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.ProjectEntityService;
 import com.cypress.isupervision.data.service.ProjectService;
@@ -62,7 +63,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private List<Project> projects;
     private int limit;
 
-    public ProjekteAssistentenView(AuthenticatedUser authenticatedUser, ProjectService projectService, ProjectEntityService projectEntityService, AssistantService assistantService)
+    public ProjekteAssistentenView(AuthenticatedUser authenticatedUser, ProjectService projectService, ProjectEntityService projectEntityService, AssistantService assistantService, AdministratorService administratorService)
     {
         this.authenticatedUser = authenticatedUser;
         this.projectService = projectService;
@@ -152,7 +153,15 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                             if (exists == 0)
                             {
                                 projects=projectService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
-                                limit=assistantService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
+                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
+                                }
+                                else
+                                {
+                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
+                                }
                                 if (projects.size()<limit)
                                 {
                                 projectService.update(this.project);

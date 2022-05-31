@@ -67,7 +67,7 @@ When testing, be sure to note your credentials in case you might need them at a 
 - Admins can put any name into the "Assistent" field.
 - Assistants can only put their own full name into the assistant field. If you are testing, you might not know the full name of the account.
   In that case you can log in with the admin account and find out the name in the "Assistenten" tab.
-- The "Titel", "Assistent" and "Deadline" are mandatory to be filled out at project creation 
+- The fields "Titel", "Assistent" and "Deadline" are mandatory to be filled out at to create a project.
 - The "Student" field is not meant to be filled out at project creation, because the students are supposed to sign up for the projects themselves. Feel free to fill the "Student"-field if needed tho.
 - The "Prüfungstermin" field of "Masterarbeiten" is not mandatory to be filled out. It is supposed to be edited at a later point in time, because the date of exam might not be known at the time of project creation.
 
@@ -118,6 +118,12 @@ I could have created an extra view for the assistants, where this is done automa
 - lvl2: bachelors thesis done
 - lvl3: masters thesis done
 
+
+### Projects, Bachelorstheses and Mastertheses:
+- Have a title, student, assistant and deadline.
+- Mastertheses additionaly has an examDate.
+- Students and assistants are implemented as Strings (would be handled differently in future applications, read more about this issue in the comments.)
+
 ***
 
 ## Comments:
@@ -127,18 +133,26 @@ The unhashed passwords are intentionally stored and shown in the "Studenten"/"As
 I am totally aware that this shouldn't be the case in any proper application.
 
 ### English/German:
-All the class names of the Views are German. This is because the application is supposed to be german, and it was quite tedious not to have the view-names and page titles in the same language.
+All the class names of the Views are German. This is because the application is supposed to be German, and it was quite tedious not to have the view-names and page titles in the same language.
 
 
-### Regarding the Project:
-This project was quite a learning experience for me. This was my first time working with Maven, Spring Boot, Spring Security, Spring JPA and Vaadin. The quality of the code is clearly lacking due to the lack of experience and time.
+### Regarding the Project and code quality:
+This project was quite a learning experience for me. This was my first time working with Maven, Spring Boot, Spring Security, Spring JPA and Vaadin.
+For that reason I focused more on learning about the framework than writing perfectly clean code.
+The quality of the code is therefore not the best, due to the lack of experience and time. Still, the functionalities are working and all requirements are met.
+If I'd have another shot at it, I would put more effort into the entities as well as classes and interfaces to improve the quality of the code.
 
 
 ### Regarding entities:
-The Project-Entities could have been done alot better. (For example: ProjectEntity.assistant ProjectEntity.student are Strings and could be replaced with an Assistant/Student-Object.) Unfortunately there was not enough time to enhance the quality of the Entities and change the code at every occurrence.
+The Project-Entities could have been done a lot better. (For example: ProjectEntity.assistant and ProjectEntity.student are Strings and could be replaced with an Assistant/Student-Object).
+Unfortunately I wasn't aware of this issue at the start of the project.
+Having that said, there was not enough time to refactor and therefore enhance the quality of the entities and change the code at every occurrence.
+When developing a similar application in the future, I would spend more time on designing the entities beforehand. 
 
 ### Regarding classes in general:
-There is quite alot of code repetition throughout the entire project. The code could be easily simplified by implementing some more classes and interfaces. Again, there was a time issue.
+There is quite a lot of code repetition throughout the entire project. This happened due to a lack of experience with the framework and web development in general.
+For example one working view has been copied multiple times, instead of spending too much time on writing a class that works for all of them. The same is true for services and repositories.
+The code could have been simplified by implementing some more classes, interfaces and methods, but unfortunately I wasn't able to refactor the code before the deadline.
 
 ***
 ## Requirements (German):

@@ -1,6 +1,7 @@
 package com.cypress.isupervision.views.masterarbeiten;
 
 import com.cypress.isupervision.data.entity.project.MastersThesis;
+import com.cypress.isupervision.data.service.AdministratorService;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.MastersThesisService;
 import com.cypress.isupervision.data.service.ProjectEntityService;
@@ -64,7 +65,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
     private List<MastersThesis> mastersTheses;
     private int limit;
 
-    public MasterarbeitenAssistentenView(AuthenticatedUser authenticatedUser, MastersThesisService mastersThesisService, ProjectEntityService projectEntityService, AssistantService assistantService)
+    public MasterarbeitenAssistentenView(AuthenticatedUser authenticatedUser, MastersThesisService mastersThesisService, ProjectEntityService projectEntityService, AssistantService assistantService, AdministratorService administratorService)
     {
         this.authenticatedUser = authenticatedUser;
         this.mastersThesisService = mastersThesisService;
@@ -156,7 +157,15 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                             if (exists == 0)
                             {
                                 mastersTheses=mastersThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
-                                limit=assistantService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
+                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
+                                }
+                                else
+                                {
+                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
+                                }
                                 if (mastersTheses.size()<limit)
                                 {
                                 mastersThesisService.update(this.mastersThesis);
