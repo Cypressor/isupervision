@@ -72,7 +72,6 @@ public class MainLayout extends AppLayout {
                 }
             }
         }
-
     }
 
     private AuthenticatedUser authenticatedUser;
