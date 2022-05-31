@@ -27,8 +27,8 @@ There is an issue where the password manager of the browser may save the wrong f
 ### Troubles with filling in the assistant name at project creation:
 Be sure to add the full name of the assistant, wich is not the username.
 It consists of "FirstName" + " " + "LastName".
-If you don't know the name of the account you are using, click on the "Abbrechen"-Button, then it should fill in automatically.
-If it doesn't work,log in  with the admin account and take a look at the "Assistenten" tab. The application has been designed like this, because
+If you don't know the name of the account you are using, click on the "Abbrechen"-Button,  then the name should be filled in automatically.
+Additionally, you can log in  with the admin account and take a look at the "Assistenten" tab. The application has been designed like this, because
 in a real world application a user would surely always know his full name.
 
 
@@ -66,7 +66,9 @@ When testing, be sure to note your credentials in case you might need them at a 
 - When creating a project, be sure the "Assistent" field is filled out. "Assistent" is defined by Firstname + " " + Lastname.
 - Admins can put any name into the "Assistent" field.
 - Assistants can only put their own full name into the assistant field. If you are testing, you might not know the full name of the account.
-  In that case you can log in with the admin account and find out the name in the "Assistenten" tab.
+  If you don't know the name of the account you are using, click on the "Abbrechen"-Button, then the name should be filled in automatically.
+  Additionally, you can log in  with the admin account and take a look at the "Assistenten" tab. The application has been designed like this, because
+  in a real world application a user would surely always know his full name.
 - The fields "Titel", "Assistent" and "Deadline" are mandatory to be filled out at to create a project.
 - The "Student" field is not meant to be filled out at project creation, because the students are supposed to sign up for the projects themselves. Feel free to fill the "Student"-field if needed tho.
 - The "Prüfungstermin" field of "Masterarbeiten" is not mandatory to be filled out. It is supposed to be edited at a later point in time, because the date of exam might not be known at the time of project creation.
