@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Route(value = "login")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver
 {
-    private final LoginForm loginForm  = new LoginForm();
+    private final LoginForm loginForm = new LoginForm();
 
     @Autowired
     public LoginView(StudentService studentService, AssistantService assistantService, UserService userService, PasswordEncoder passwordEncoder)
@@ -33,8 +33,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver
         setAlignItems(FlexComponent.Alignment.CENTER);
         setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         loginForm.setAction("login");
-        add(new H1("iSupervision"),loginForm);
-        add(new Paragraph("Bitte loggen Sie sich ein, um Zugriff auf die Projektdaten zu erhalten."),loginForm);
+        add(new H1("iSupervision"), loginForm);
+        add(new Paragraph("Bitte loggen Sie sich ein, um Zugriff auf die Projektdaten zu erhalten."), loginForm);
         loginForm.setForgotPasswordButtonVisible(false);
         add(loginForm);
         add(new RouterLink("Registrierung", RegistrationView.class));
@@ -43,12 +43,12 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent)
     {
-        if(beforeEnterEvent.getLocation().getQueryParameters().getParameters().containsKey("error"))
+        if (beforeEnterEvent.getLocation().getQueryParameters().getParameters().containsKey("error"))
         {
             loginForm.setError(true);
         }
     }
-    }
+}
 
 
 

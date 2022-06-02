@@ -211,6 +211,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                 {
                     if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.bachelorsThesis.getAssistant()))
                     {
+                        String bachelorsThesisAssistant = this.bachelorsThesis.getAssistant();
                         binder.writeBean(this.bachelorsThesis);
                         if (title.getValue().trim().equals(""))
                         {
@@ -232,10 +233,27 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                         {
                             if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
                             {
-                                bachelorsThesisService.update(this.bachelorsThesis);
-                                clearForm();
-                                refreshGrid();
-                                Notification.show("Bachelorarbeit wurde bearbeitet.");
+                                bachelorsTheses=bachelorsThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
+                                }
+                                else
+                                {
+                                    limit = assistantService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
+                                }
+                                if (bachelorsTheses.size()<limit || bachelorsThesisAssistant.equals(authenticatedUser.get().get().getFirstname()+ " " +authenticatedUser.get().get().getLastname()))
+                                {
+                                    bachelorsThesisService.update(this.bachelorsThesis);
+                                    clearForm();
+                                    refreshGrid();
+                                    Notification.show("Bachelorarbeit wurde bearbeitet.");
+                                }
+                                else
+                                {
+                                    Notification.show("Ihr Limit an Bachelorarbeiten ist bereits erreicht.");
+                                }
                             }
                         } else
                         {

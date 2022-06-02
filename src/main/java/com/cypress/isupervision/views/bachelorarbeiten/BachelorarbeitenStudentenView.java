@@ -64,7 +64,7 @@ public class BachelorarbeitenStudentenView extends Div
                 {
                     if (projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname()).size() > 0)
                     {
-                        Notification.show("Sie sind bereits für eine Bachelorarbeit angemeldet");
+                        Notification.show("Sie sind bereits für eine Arbeit angemeldet");
                     } else
                     {
                         if(!(studentService.get(authenticatedUser.get().get().getUsername()).getLevel()<1))

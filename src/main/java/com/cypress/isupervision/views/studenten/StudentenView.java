@@ -129,27 +129,34 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                 {
                     if (this.student != null)
                     {
-                    int exists = userService.exists(this.student);
-                    if (exists == 0)
-                    {
-                        this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
-                        studentService.update(this.student);
-                        clearForm();
-                        refreshGrid();
-                        Notification.show("Neuer Student wurde angelegt.");
-                    }
-                   if (exists == 1 || exists == 3)
-                    {
-                        clearForm();
-                        refreshGrid();
-                        Notification.show("Username existiert bereits.");
-                    }
-                    if (exists == 2 || exists == 3)
-                    {
-                        clearForm();
-                        refreshGrid();
-                        Notification.show("Email existiert bereits");
-                    }
+                        if(student.getLevel()<4)
+                        {
+                            int exists = userService.exists(this.student);
+                            if (exists == 0)
+                            {
+                                this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
+                                studentService.update(this.student);
+                                clearForm();
+                                refreshGrid();
+                                Notification.show("Neuer Student wurde angelegt.");
+                            }
+                            if (exists == 1 || exists == 3)
+                            {
+                                clearForm();
+                                refreshGrid();
+                                Notification.show("Username existiert bereits.");
+                            }
+                            if (exists == 2 || exists == 3)
+                            {
+                                clearForm();
+                                refreshGrid();
+                                Notification.show("Email existiert bereits");
+                            }
+                        }
+                        else
+                        {
+                            Notification.show("Bitte eine Zahl zwischen 0-3 für Level eintragen.");
+                        }
                     }
                 }
                 UI.getCurrent().navigate(StudentenView.class);
@@ -176,11 +183,18 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                     }
                     else
                     {
+                        if(student.getLevel()<4)
+                        {
                             this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
                             studentService.update(this.student);
                             clearForm();
                             refreshGrid();
                             Notification.show("Student wurde bearbeitet.");
+                        }
+                        else
+                        {
+                            Notification.show("Bitte eine Zahl zwischen 0-3 für Level eintragen.");
+                        }
                     }
                }
                 else

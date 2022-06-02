@@ -66,7 +66,7 @@ public class ProjekteStudentenView extends Div
                     {
                         if (projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname()).size() > 0)
                         {
-                            Notification.show("Sie sind bereits für ein Projekt angemeldet");
+                            Notification.show("Sie sind bereits für eine Arbeit angemeldet");
                         } else
                         {
                             warning.open();

@@ -65,7 +65,7 @@ public class MasterarbeitenStudentenView extends Div
                 {
                     if (projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname()).size() > 0)
                     {
-                        Notification.show("Sie sind bereits für eine Masterarbeit angemeldet");
+                        Notification.show("Sie sind bereits für eine Arbeit angemeldet");
                     } else
                     {
                         if(!(studentService.get(authenticatedUser.get().get().getUsername()).getLevel()<2))

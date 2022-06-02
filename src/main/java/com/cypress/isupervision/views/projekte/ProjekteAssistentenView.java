@@ -211,6 +211,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                 {
                     if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.project.getAssistant()))
                     {
+                        String projectAssistant=this.project.getAssistant();
                         binder.writeBean(this.project);
                         if (title.getValue().trim().equals(""))
                         {
@@ -232,10 +233,29 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                         {
                             if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
                             {
-                                projectService.update(this.project);
-                                clearForm();
-                                refreshGrid();
-                                Notification.show("Projekt wurde bearbeitet.");
+                                projects=projectService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
+                                }
+                                else
+                                {
+                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
+                                }
+                                if (projects.size()<limit || projectAssistant.equals(authenticatedUser.get().get().getFirstname()+ " " +authenticatedUser.get().get().getLastname()))
+                                {
+
+                                    projectService.update(this.project);
+                                    clearForm();
+                                    refreshGrid();
+                                    Notification.show("Projekt wurde bearbeitet.");
+
+                                }
+                                else
+                                {
+                                    Notification.show("Ihr Limit an Projekten ist bereits erreicht.");
+                                }
                             }
                         } else
                         {

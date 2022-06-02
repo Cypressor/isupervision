@@ -30,22 +30,22 @@ public class AccountStudentenView extends VerticalLayout
             if(projectBox.getValue().equals("Kein Projekt"))
             {
                 student.setLevel(0);
-                Notification.show("Hochwertigste Arbeit: Kein Projekt. Level wurde auf 0 gesetzt");
+                Notification.show("Hochwertigste Arbeit: Kein Projekt.");
             }
             else if(projectBox.getValue().equals("Projekt"))
             {
                 student.setLevel(1);
-                Notification.show("Hochwertigste Arbeit:Projekt. Level wurde auf 1 gesetzt");
+                Notification.show("Hochwertigste Arbeit:Projekt.");
             }
             else if(projectBox.getValue().equals("Bachelorarbeit"))
             {
                 student.setLevel(2);
-                Notification.show("Hochwertigste Arbeit: Bachelorarbeit. Level wurde auf 2 gesetzt");
+                Notification.show("Hochwertigste Arbeit: Bachelorarbeit.");
             }
             else if(projectBox.getValue().equals("Masterarbeit"))
             {
                 student.setLevel(3);
-                Notification.show("Hochwertigste Arbeit: Masterarbeit. Level wurde auf 3 gesetzt");
+                Notification.show("Hochwertigste Arbeit: Masterarbeit.");
             }
         studentService.update(student);
         });

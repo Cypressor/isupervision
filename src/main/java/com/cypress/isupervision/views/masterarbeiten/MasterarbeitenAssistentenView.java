@@ -216,6 +216,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                 {
                     if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.mastersThesis.getAssistant()))
                     {
+                        String mastersThesisAssistant=this.mastersThesis.getAssistant();
                         binder.writeBean(this.mastersThesis);
                         if (title.getValue().trim().equals(""))
                         {
@@ -237,10 +238,27 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                         {
                             if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
                             {
-                                mastersThesisService.update(this.mastersThesis);
-                                clearForm();
-                                refreshGrid();
-                                Notification.show("Masterarbeit wurde bearbeitet.");
+                                mastersTheses=mastersThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
+                                }
+                                else
+                                {
+                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
+                                }
+                                if (mastersTheses.size()<limit || mastersThesisAssistant.equals(authenticatedUser.get().get().getFirstname()+ " " +authenticatedUser.get().get().getLastname()))
+                                {
+                                    mastersThesisService.update(this.mastersThesis);
+                                    clearForm();
+                                    refreshGrid();
+                                    Notification.show("Masterarbeit wurde bearbeitet.");
+                                }
+                                else
+                                {
+                                    Notification.show("Ihr Limit an Masterarbeiten ist bereits erreicht.");
+                                }
                             }
                         } else
                         {
