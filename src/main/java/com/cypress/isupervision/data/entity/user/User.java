@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "application_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"username","email"})})
-public class User extends AbstractEntity
+public abstract class User extends AbstractEntity
 {
     private String username;
     private String firstname;

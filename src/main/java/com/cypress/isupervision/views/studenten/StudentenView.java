@@ -8,13 +8,12 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -228,8 +227,21 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         level = new TextField("Level");
         Component[] fields = new Component[]{username, firstname, lastname, email, password, level};
 
+        H4 header = new H4("hochwertigste Arbeit:");
+        Span level0 = new Span("Level 0: Kein Projekt");
+        Span level1 = new Span("Level 1: Projekt");
+        Span level2 = new Span("Level 2: Bachelorarbeit");
+        Span level3 = new Span("Level 3: Masterarbeit");
+
+        VerticalLayout content = new VerticalLayout(header,level0,level1,level2,level3);
+        content.setSpacing(false);
+        content.setPadding(false);
+
+        Details levelDetails = new Details("Details", content);
+        levelDetails.setOpened(false);
+
         formLayout.add(fields);
-        editorDiv.add(formLayout);
+        editorDiv.add(formLayout, levelDetails);
         createButtonLayout(editorLayoutDiv);
         splitLayout.addToSecondary(editorLayoutDiv);
     }
@@ -256,7 +268,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private void createDialog()
     {
         warning.add(new H4("Löschen"));
-        warning.add(new Paragraph("Sind Sie sich sicher, dass Sie diesen Studenten löschen möchten?"));
+        warning.add(new Paragraph("Sind Sie sicher, dass Sie diesen Studenten löschen möchten?"));
         Button delete = new Button("Löschen");
         Button cancel = new Button("Abbrechen");
         warning.add(delete, cancel);

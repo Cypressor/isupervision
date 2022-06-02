@@ -323,7 +323,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private void createDialog()
     {
         warning.add(new H4("Löschen"));
-        warning.add(new Paragraph("Sind Sie sich sicher, dass Sie dieses Projekt löschen möchten?"));
+        warning.add(new Paragraph("Sind Sie sicher, dass Sie dieses Projekt löschen möchten?"));
         Button delete = new Button("Löschen");
         Button cancel = new Button("Abbrechen");
         warning.add(delete, cancel);

@@ -97,7 +97,7 @@ public class DataGenerator {
                 student = students.get(i);
                 student.setUsername("teststudent"+(i+1));
                 student.setHashedPassword(passwordEncoder.encode(student.getPassword()));
-                student.setLevel(rng.nextInt(3));
+                student.setLevel(rng.nextInt(4));
                 students.set(i,student);
             }
             studentRepository.saveAll(students);
@@ -163,7 +163,6 @@ public class DataGenerator {
                 bachelorsTheses.set(i,bachelorsThesis);
             }
             bachelorsThesisRepository.saveAll(bachelorsTheses);
-
 
             logger.info("... generating 25 MastersThesis entities...");
             seed = 567;

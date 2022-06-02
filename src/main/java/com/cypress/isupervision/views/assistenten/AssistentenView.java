@@ -92,9 +92,9 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         grid.getColumnByKey("lastname").setHeader("Nachname");
         grid.getColumnByKey("email").setHeader("Email");
         grid.getColumnByKey("password").setHeader("Passwort");
-        grid.getColumnByKey("projLimit").setHeader("PA-Limit");
-        grid.getColumnByKey("baLimit").setHeader("BA-Limit");
-        grid.getColumnByKey("maLimit").setHeader("MA-Limit");
+        grid.getColumnByKey("projLimit").setHeader("Pa-Limit");
+        grid.getColumnByKey("baLimit").setHeader("Ba-Limit");
+        grid.getColumnByKey("maLimit").setHeader("Ma-Limit");
 
         grid.setItems(query -> assistantService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
