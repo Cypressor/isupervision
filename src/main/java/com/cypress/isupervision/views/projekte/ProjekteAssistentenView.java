@@ -11,6 +11,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -19,6 +20,8 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -52,6 +55,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private TextField assistant;
     private TextField student;
     private DatePicker deadline;
+    private Checkbox finished;
     private Button cancel = new Button("Abbrechen");
     private Button save = new Button("Speichern");
     private Button delete = new Button("Löschen");
@@ -81,6 +85,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         grid.addColumn("assistant").setAutoWidth(true);
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
+        grid.addComponentColumn(projectFinished -> createFinishedIcon(projectFinished.isFinished())).setHeader("Abgeschlossen");
 
         grid.getColumnByKey("title").setHeader("Titel");
         grid.getColumnByKey("assistant").setHeader("Assistent");
@@ -312,7 +317,8 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         assistant = new TextField("Assistent");
         student = new TextField("Student");
         deadline = new DatePicker("Deadline");
-        Component[] fields = new Component[]{title, assistant, student, deadline};
+        finished = new Checkbox("Abgeschlossen");
+        Component[] fields = new Component[]{title, assistant, student, deadline, finished};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -397,4 +403,29 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
             assistant.setValue(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
         }
     }
+    private Icon createFinishedIcon(boolean isFinished)
+    {
+        Icon icon;
+        if(isFinished)
+        {
+            icon = createIcon(VaadinIcon.CHECK, "Ja");
+            icon.getElement().getThemeList().add("badge success");
+        }
+        else
+        {
+            icon = createIcon(VaadinIcon.CLOSE_SMALL,"Nein");
+            icon.getElement().getThemeList().add("badge error");
+        }
+        return icon;
+    }
+
+    private Icon createIcon(VaadinIcon vaadinIcon, String label)
+    {
+        Icon icon = vaadinIcon.create();
+        icon.getStyle().set("padding","var(--lumo-space-xs");
+        icon.getElement().setAttribute("aria-lavel",label);
+        icon.getElement().setAttribute("title", label);
+        return icon;
+    }
+
 }

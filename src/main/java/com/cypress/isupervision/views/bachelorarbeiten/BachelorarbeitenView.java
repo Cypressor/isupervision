@@ -13,7 +13,7 @@ import javax.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @PageTitle("Bachelorarbeiten")
-@Route(value = "bachelorsthesis/:bachelorsthesisID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "bachelorstheses", layout = MainLayout.class)
 @PermitAll
 public class BachelorarbeitenView extends Div implements BeforeEnterObserver {
 

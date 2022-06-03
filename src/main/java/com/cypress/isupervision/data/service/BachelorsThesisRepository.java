@@ -20,6 +20,6 @@ public interface BachelorsThesisRepository extends JpaRepository<BachelorsThesis
     List<BachelorsThesis> searchForStudent(@Param("searchTerm") String searchTerm);
 
     @Query("select bachelorsThesis from BachelorsThesis bachelorsThesis " +
-            "where (bachelorsThesis.student) is null or (bachelorsThesis.student) like :searchTerm")
-    List<BachelorsThesis> searchOpenProjects(@Param("searchTerm") String searchTerm);
+            "where ((bachelorsThesis.student) is null or (bachelorsThesis.student) = '') and (bachelorsThesis.isFinished) = false")
+    List<BachelorsThesis> searchOpenProjects();
 }

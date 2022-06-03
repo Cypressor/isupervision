@@ -19,6 +19,6 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     List<Project> searchForStudent(@Param("searchTerm") String searchTerm);
 
     @Query("select project from Project project " +
-            "where (project.student) is null or (project.student) like :searchTerm")
-    List<Project> searchOpenProjects(@Param("searchTerm") String searchTerm);
+            "where ((project.student) is null or (project.student) = '') and (project.isFinished) = false")
+    List<Project> searchOpenProjects();
 }

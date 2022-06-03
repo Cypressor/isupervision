@@ -7,7 +7,6 @@ import java.util.Set;
 @Entity
 public class Administrator extends User {
 
-    private Integer level;
     private Integer projLimit;
     private Integer baLimit;
     private Integer maLimit;
@@ -15,14 +14,13 @@ public class Administrator extends User {
     public Administrator()
     {
         this.setRoles(Set.of(Role.ADMIN, Role.ASSISTANT, Role.STUDENT));
-        this.level=3;
+
         this.projLimit=1000;
         this.baLimit=1000;
         this.maLimit=1000;
     }
 
-    public Integer getLevel() { return level; }
-    public void setLevel(Integer level) { this.level = level; }
+
     public Integer getProjLimit() {
         return projLimit;
     }

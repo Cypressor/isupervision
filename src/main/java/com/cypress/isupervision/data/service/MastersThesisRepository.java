@@ -20,6 +20,6 @@ public interface MastersThesisRepository extends JpaRepository<MastersThesis, UU
     List<MastersThesis> searchForStudent(@Param("searchTerm") String searchTerm);
 
     @Query("select mastersThesis from MastersThesis mastersThesis " +
-            "where (mastersThesis.student) is null or (mastersThesis.student) like :searchTerm")
-    List<MastersThesis> searchOpenProjects(@Param("searchTerm") String searchTerm);
+            "where ((mastersThesis.student) is null or (mastersThesis.student) = '') and (mastersThesis.isFinished) = false")
+    List<MastersThesis> searchOpenProjects();
 }

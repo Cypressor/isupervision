@@ -43,7 +43,7 @@ public class MastersThesisService {
     public List<MastersThesis> searchForAssistant(String assistantName) {return repository.searchForAssistant(assistantName);}
     public List<MastersThesis> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
 
-    public List<MastersThesis> searchOpenProjects() {return repository.searchOpenProjects("");}
+    public List<MastersThesis> searchOpenProjects() {return repository.searchOpenProjects();}
 
     public int count() {
         return (int) repository.count();

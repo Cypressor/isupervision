@@ -1,12 +1,15 @@
 package com.cypress.isupervision.views.bachelorarbeiten;
 
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
+import com.cypress.isupervision.data.entity.project.ProjectEntity;
 import com.cypress.isupervision.data.entity.user.Student;
 import com.cypress.isupervision.data.service.BachelorsThesisService;
 import com.cypress.isupervision.data.service.ProjectEntityService;
 import com.cypress.isupervision.data.service.StudentService;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
+import com.cypress.isupervision.views.projekte.ProjekteStudentenView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -26,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @PageTitle("Bachelorarbeiten Studenten")
-@Route(value = "bachelorsthesis/student/:bachelorsthesisID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "bachelorstheses/student/:bachelorsthesisID?/:action?(edit)", layout = MainLayout.class)
 @RolesAllowed("STUDENT")
 public class BachelorarbeitenStudentenView extends Div
 {
@@ -62,19 +65,34 @@ public class BachelorarbeitenStudentenView extends Div
             {
                 if (student != null)
                 {
-                    if (projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname()).size() > 0)
+                    if(projectEntityService.get(bachelorsThesisBox.getValue()).getStudent()==null ||projectEntityService.get(bachelorsThesisBox.getValue()).getStudent().equals(""))
                     {
-                        Notification.show("Sie sind bereits für eine Arbeit angemeldet");
-                    } else
+                        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
+                        for(int i=0;i<projectEntities.size();i++)
+                        {
+                            if(projectEntities.get(i).isFinished())
+                            {
+                                projectEntities.remove(projectEntities.get(i));
+                                i--;
+                            }
+                        }
+                        if (projectEntities.size() > 0)
+                        {
+                            Notification.show("Sie sind bereits für eine Arbeit angemeldet.");
+                        } else
+                        {
+                            if (!(studentService.get(authenticatedUser.get().get().getUsername()).getLevel() < 1))
+                            {
+                                warning.open();
+                            } else
+                            {
+                                Notification.show("Sie können sich nicht für eine Bachelorarbeit anmelden, da Sie noch kein Projekt abgeschlossen haben.");
+                            }
+                        }
+                    }
+                    else
                     {
-                        if(!(studentService.get(authenticatedUser.get().get().getUsername()).getLevel()<1))
-                        {
-                            warning.open();
-                        }
-                        else
-                        {
-                            Notification.show("Sie können sich nicht für eine Bachelorarbeit anmelden, da Sie noch kein Projekt abgeschlossen haben");
-                        }
+                        Notification.show("Bachelorarbeit bereits vergeben.");
                     }
                 }
             }
@@ -82,6 +100,7 @@ public class BachelorarbeitenStudentenView extends Div
             {
                 Notification.show("Bitte wählen Sie zuerst ein Bachelorarbeit aus.");
             }
+            UI.getCurrent().navigate("bachelorstheses");
         });
     }
 

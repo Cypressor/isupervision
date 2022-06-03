@@ -13,7 +13,7 @@ import javax.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @PageTitle("Masterarbeiten")
-@Route(value = "mastersthesis", layout = MainLayout.class)
+@Route(value = "masterstheses", layout = MainLayout.class)
 @PermitAll
 
 public class MasterarbeitenView extends VerticalLayout implements BeforeEnterObserver {

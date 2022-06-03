@@ -1,11 +1,14 @@
 package com.cypress.isupervision.views.projekte;
 import com.cypress.isupervision.data.entity.project.Project;
+import com.cypress.isupervision.data.entity.project.ProjectEntity;
 import com.cypress.isupervision.data.entity.user.Student;
 import com.cypress.isupervision.data.service.ProjectEntityService;
 import com.cypress.isupervision.data.service.ProjectService;
 import com.cypress.isupervision.data.service.StudentService;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
+import com.cypress.isupervision.views.studenten.StudentenView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -64,9 +67,18 @@ public class ProjekteStudentenView extends Div
 
                     if(projectEntityService.get(projectBox.getValue()).getStudent()==null ||projectEntityService.get(projectBox.getValue()).getStudent().equals(""))
                     {
-                        if (projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname()).size() > 0)
+                        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
+                        for(int i=0;i<projectEntities.size();i++)
                         {
-                            Notification.show("Sie sind bereits für eine Arbeit angemeldet");
+                            if(projectEntities.get(i).isFinished())
+                            {
+                                projectEntities.remove(projectEntities.get(i));
+                                i--;
+                            }
+                        }
+                        if (projectEntities.size() > 0)
+                        {
+                            Notification.show("Sie sind bereits für eine Arbeit angemeldet.");
                         } else
                         {
                             warning.open();
@@ -82,6 +94,7 @@ public class ProjekteStudentenView extends Div
             {
                 Notification.show("Bitte wählen Sie zuerst ein Projekt aus.");
             }
+            UI.getCurrent().navigate("projects");
         });
     }
 
@@ -156,6 +169,7 @@ public class ProjekteStudentenView extends Div
         projectService.update(project);
         Notification.show("Du wurdest für das Projekt angemeldet.");
         warning.close();
+
     }
 
     private void cancelSignup()

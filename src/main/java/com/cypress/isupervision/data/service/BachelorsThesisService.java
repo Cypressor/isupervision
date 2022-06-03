@@ -44,7 +44,7 @@ public class BachelorsThesisService {
 
     public List<BachelorsThesis> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
 
-    public List<BachelorsThesis> searchOpenProjects() {return repository.searchOpenProjects("");}
+    public List<BachelorsThesis> searchOpenProjects() {return repository.searchOpenProjects();}
 
     public int count() {
         return (int) repository.count();

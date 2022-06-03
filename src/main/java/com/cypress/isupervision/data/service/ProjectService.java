@@ -36,7 +36,7 @@ public class ProjectService  {
 
     public List<Project> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
 
-    public List<Project> searchOpenProjects() {return repository.searchOpenProjects("");}
+    public List<Project> searchOpenProjects() {return repository.searchOpenProjects();}
 
     public void delete(UUID id) {
         repository.deleteById(id);
