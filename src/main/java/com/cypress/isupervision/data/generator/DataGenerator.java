@@ -141,6 +141,7 @@ public class DataGenerator
             projectRepositoryGenerator.setData(Project::setTitle, DataType.SENTENCE);
             projectRepositoryGenerator.setData(Project::setDeadline, DataType.DATE_NEXT_1_YEAR);
             projects = projectRepositoryGenerator.create(25, seed);
+
             List<Student> attendants=new ArrayList<>();
             List<Student> finishers=new ArrayList<>();
 
@@ -154,7 +155,7 @@ public class DataGenerator
                 {
                     attendants.add(students.get(randomNumber));
                     project.setStudent(students.get(randomNumber).getFirstname()+" "+students.get(randomNumber).getLastname());
-                    if((randomNumber/10)<1)
+                    if((randomNumber%2)==1)
                     {
                         finishers.add(students.get(randomNumber));
                         project.setFinished(true);

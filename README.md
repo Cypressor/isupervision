@@ -111,15 +111,8 @@ I could have created an extra view for the assistants, where this is done automa
 
 ### Students:
 - Can only see the projects/bachelorstheses/mastertheses where no student is assigned to yet. Can additionally see the project they are assigned to in the "Meine Projekte" tab.
-- Can signup for a single project/bachelorsthesis/mastersthesis depending on their level.
-- Can adjust their level in the Account section:
-
-
-- lvl 0: no accomplishment - can only sing up for projects
-- lvl1: project done
-- lvl2: bachelors thesis done
-- lvl3: masters thesis done
-
+- Can signup for project/bachelorsthesis/mastersthesis depending on their level.
+- Can only have one active project/bachelorsthesis/mastersthesis at a time.
 
 ### Projects, Bachelorstheses and Mastertheses:
 - Have a title, student, assistant and deadline.
