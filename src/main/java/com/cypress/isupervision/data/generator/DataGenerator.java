@@ -1,4 +1,5 @@
 package com.cypress.isupervision.data.generator;
+
 import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
 import com.cypress.isupervision.data.entity.project.MastersThesis;
@@ -7,13 +8,14 @@ import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.entity.project.Project;
 import com.cypress.isupervision.data.entity.user.Student;
 import com.cypress.isupervision.data.service.*;
+import com.sun.source.tree.Tree;
 import com.vaadin.exampledata.DataType;
 import com.vaadin.exampledata.ExampleDataGenerator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -21,16 +23,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringComponent
-public class DataGenerator {
+public class DataGenerator
+{
 
     @Bean
     public CommandLineRunner loadData(PasswordEncoder passwordEncoder, UserRepository userRepository,
                                       ProjectRepository projectRepository, BachelorsThesisRepository bachelorsThesisRepository,
                                       MastersThesisRepository mastersThesisRepository, StudentRepository studentRepository,
-                                      AssistantRepository assistantRepository, AdministratorRepository administratorRepository) {
-        return args -> {
+                                      AssistantRepository assistantRepository, AdministratorRepository administratorRepository)
+    {
+        return args ->
+        {
             Logger logger = LoggerFactory.getLogger(getClass());
-            if (userRepository.count() != 0L) {
+            if (userRepository.count() != 0L)
+            {
                 logger.info("Using existing database");
                 return;
             }
@@ -91,14 +97,14 @@ public class DataGenerator {
             studentRepositoryGenerator.setData(Student::setLastname, DataType.LAST_NAME);
             studentRepositoryGenerator.setData(Student::setEmail, DataType.EMAIL);
             studentRepositoryGenerator.setData(Student::setPassword, DataType.TWO_WORDS);
-            students=studentRepositoryGenerator.create(20, seed);
-            for (int i=0; i<students.size();i++)
+            students = studentRepositoryGenerator.create(20, seed);
+            for (int i = 0; i < students.size(); i++)
             {
                 student = students.get(i);
-                student.setUsername("teststudent"+(i+1));
+                student.setUsername("teststudent" + (i + 1));
                 student.setHashedPassword(passwordEncoder.encode(student.getPassword()));
                 student.setLevel(rng.nextInt(4));
-                students.set(i,student);
+                students.set(i, student);
             }
             studentRepository.saveAll(students);
 
@@ -112,16 +118,16 @@ public class DataGenerator {
             assistantRepositoryGenerator.setData(Assistant::setLastname, DataType.LAST_NAME);
             assistantRepositoryGenerator.setData(Assistant::setEmail, DataType.EMAIL);
             assistantRepositoryGenerator.setData(Assistant::setPassword, DataType.TWO_WORDS);
-            assistants=assistantRepositoryGenerator.create(5, seed);
-            for (int i=0; i<assistants.size();i++)
+            assistants = assistantRepositoryGenerator.create(5, seed);
+            for (int i = 0; i < assistants.size(); i++)
             {
                 assistant = assistants.get(i);
-                assistant.setUsername("testassistant"+(i+1));
+                assistant.setUsername("testassistant" + (i + 1));
                 assistant.setHashedPassword(passwordEncoder.encode(assistant.getPassword()));
                 assistant.setProjLimit(rng.nextInt(20));
                 assistant.setBaLimit(rng.nextInt(20));
                 assistant.setMaLimit(rng.nextInt(20));
-                assistants.set(i,assistant);
+                assistants.set(i, assistant);
             }
             assistantRepository.saveAll(assistants);
 
@@ -134,16 +140,30 @@ public class DataGenerator {
                     LocalDateTime.of(2022, 5, 24, 0, 0, 0));
             projectRepositoryGenerator.setData(Project::setTitle, DataType.SENTENCE);
             projectRepositoryGenerator.setData(Project::setDeadline, DataType.DATE_NEXT_1_YEAR);
-            projects=projectRepositoryGenerator.create(25, seed);
-            for (int i=0; i<projects.size();i++)
+            projects = projectRepositoryGenerator.create(25, seed);
+            List<Student> attendants=new ArrayList<>();
+            List<Student> finishers=new ArrayList<>();
+
+            for (int i = 0; i < projects.size(); i++)
             {
                 project = projects.get(i);
-                randomNumber= rng.nextInt(assistants.size()-1);
-                project.setAssistant(assistants.get(randomNumber).getFirstname()+" "+assistants.get(randomNumber).getLastname());
-                projects.set(i,project);
+                randomNumber = rng.nextInt(assistants.size());
+                project.setAssistant(assistants.get(randomNumber).getFirstname() + " " + assistants.get(randomNumber).getLastname());
+                randomNumber = rng.nextInt(students.size());
+                if(!attendants.contains(students.get(randomNumber)))
+                {
+                    attendants.add(students.get(randomNumber));
+                    project.setStudent(students.get(randomNumber).getFirstname()+" "+students.get(randomNumber).getLastname());
+                    if((randomNumber/10)<1)
+                    {
+                        finishers.add(students.get(randomNumber));
+                        project.setFinished(true);
+                    }
+                }
+                projects.set(i, project);
             }
-            projectRepository.saveAll(projects);
 
+            projectRepository.saveAll(projects);
 
             logger.info("... generating 25 BachelorsThesis entities...");
             seed = 456;
@@ -154,14 +174,18 @@ public class DataGenerator {
                     BachelorsThesis.class, LocalDateTime.of(2022, 5, 24, 0, 0, 0));
             bachelorarbeitRepositoryGenerator.setData(BachelorsThesis::setTitle, DataType.SENTENCE);
             bachelorarbeitRepositoryGenerator.setData(BachelorsThesis::setDeadline, DataType.DATE_NEXT_1_YEAR);
-            bachelorsTheses=bachelorarbeitRepositoryGenerator.create(25, seed);
-            for (int i=0; i<projects.size();i++)
+            bachelorsTheses = bachelorarbeitRepositoryGenerator.create(25, seed);
+            for (int i = 0; i < projects.size(); i++)
             {
                 bachelorsThesis = bachelorsTheses.get(i);
-                randomNumber= rng.nextInt(assistants.size()-1);
-                bachelorsThesis.setAssistant(assistants.get(randomNumber).getFirstname()+" "+assistants.get(randomNumber).getLastname());
-                bachelorsTheses.set(i,bachelorsThesis);
+                randomNumber = rng.nextInt(assistants.size());
+                bachelorsThesis.setAssistant(assistants.get(randomNumber).getFirstname() + " " + assistants.get(randomNumber).getLastname());
+                bachelorsTheses.set(i, bachelorsThesis);
             }
+
+
+
+
             bachelorsThesisRepository.saveAll(bachelorsTheses);
 
             logger.info("... generating 25 MastersThesis entities...");
@@ -173,14 +197,18 @@ public class DataGenerator {
                     MastersThesis.class, LocalDateTime.of(2022, 5, 24, 0, 0, 0));
             masterarbeitRepositoryGenerator.setData(MastersThesis::setTitle, DataType.SENTENCE);
             masterarbeitRepositoryGenerator.setData(MastersThesis::setDeadline, DataType.DATE_NEXT_1_YEAR);
-            mastersTheses= masterarbeitRepositoryGenerator.create(25, seed);
-            for (int i=0; i<projects.size();i++)
+            mastersTheses = masterarbeitRepositoryGenerator.create(25, seed);
+            for (int i = 0; i < projects.size(); i++)
             {
                 mastersThesis = mastersTheses.get(i);
-                randomNumber= rng.nextInt(assistants.size()-1);
-                mastersThesis.setAssistant(assistants.get(randomNumber).getFirstname()+" "+assistants.get(randomNumber).getLastname());
-                mastersTheses.set(i,mastersThesis);
+                randomNumber = rng.nextInt(assistants.size());
+                mastersThesis.setAssistant(assistants.get(randomNumber).getFirstname() + " " + assistants.get(randomNumber).getLastname());
+                mastersTheses.set(i, mastersThesis);
+
+
             }
+
+
             mastersThesisRepository.saveAll(mastersTheses);
 
             logger.info("Generated demo data");

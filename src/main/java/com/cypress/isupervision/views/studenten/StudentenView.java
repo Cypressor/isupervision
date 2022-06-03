@@ -1,13 +1,18 @@
 package com.cypress.isupervision.views.studenten;
 
+import com.cypress.isupervision.data.ProjectType;
+import com.cypress.isupervision.data.entity.project.ProjectEntity;
 import com.cypress.isupervision.data.entity.user.Student;
+import com.cypress.isupervision.data.service.ProjectEntityService;
 import com.cypress.isupervision.data.service.StudentService;
 import com.cypress.isupervision.data.service.UserService;
+import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -29,6 +34,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
@@ -49,7 +55,6 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private TextField lastname;
     private EmailField email;
     private TextField password;
-    private TextField level;
     private Button cancel = new Button("Abbrechen");
     private Button save = new Button("Speichern");
     private Button delete = new Button("Löschen");
@@ -58,10 +63,13 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private Student student;
     private final StudentService studentService;
     private Dialog warning = new Dialog();
+    private ProjectEntityService projectEntityService;
+    private AuthenticatedUser authenticatedUser;
 
     @Autowired
-    public StudentenView(StudentService studentService, UserService userService, PasswordEncoder passwordEncoder) {
+    public StudentenView(StudentService studentService, UserService userService, PasswordEncoder passwordEncoder, ProjectEntityService projectEntityService, AuthenticatedUser authenticatedUser) {
 
+        this.projectEntityService =projectEntityService;
         this.studentService = studentService;
         addClassNames("studenten-view");
 
@@ -78,14 +86,13 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         grid.addColumn("lastname").setAutoWidth(true);
         grid.addColumn("email").setAutoWidth(true);
         grid.addColumn("password").setAutoWidth(true);
-        grid.addColumn("level").setAutoWidth(true);
+        grid.addColumn(student -> getStudentMaxAchievement(student)).setHeader("Abschluss");
 
         grid.getColumnByKey("username").setHeader("Benutzername");
         grid.getColumnByKey("firstname").setHeader("Vorname");
         grid.getColumnByKey("lastname").setHeader("Nachname");
         grid.getColumnByKey("email").setHeader("Email");
         grid.getColumnByKey("password").setHeader("Passwort");
-        grid.getColumnByKey("level").setHeader("Level");
 
         grid.setItems(query -> studentService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
@@ -106,7 +113,6 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         binder = new BeanValidationBinder<>(Student.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField(level).withConverter(new StringToIntegerConverter("Only numbers are allowed")).bind("level");
         binder.bindInstanceFields(this);
 
         //Hook up Cancel Button
@@ -121,7 +127,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                 this.student = new Student();
                 binder.writeBean(this.student);
 
-                if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || level.getValue().trim().equals(""))
+                if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals(""))
                 {
                     Notification.show("Bitte alle Felder ausfüllen.");
                 }
@@ -177,24 +183,17 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                 if (this.student != null)
                 {
                     binder.writeBean(this.student);
-                    if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("") || level.getValue().trim().equals(""))
+                    if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals(""))
                     {
                         Notification.show("Bitte alle Felder ausfüllen.");
                     }
                     else
                     {
-                        if(student.getLevel()<4)
-                        {
                             this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
                             studentService.update(this.student);
                             clearForm();
                             refreshGrid();
                             Notification.show("Student wurde bearbeitet.");
-                        }
-                        else
-                        {
-                            Notification.show("Bitte eine Zahl zwischen 0-3 für Level eintragen.");
-                        }
                     }
                }
                 else
@@ -205,6 +204,9 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         } catch (ValidationException validationException) {
             Notification.show("Es ist leider etwas schief gegangen.");
         }});
+
+
+
     }
 
     @Override
@@ -238,24 +240,10 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         lastname = new TextField("Nachname");
         email = new EmailField("Email");
         password = new TextField("Passwort");
-        level = new TextField("Level");
-        Component[] fields = new Component[]{username, firstname, lastname, email, password, level};
-
-        H4 header = new H4("hochwertigste Arbeit:");
-        Span level0 = new Span("Level 0: Kein Projekt");
-        Span level1 = new Span("Level 1: Projekt");
-        Span level2 = new Span("Level 2: Bachelorarbeit");
-        Span level3 = new Span("Level 3: Masterarbeit");
-
-        VerticalLayout content = new VerticalLayout(header,level0,level1,level2,level3);
-        content.setSpacing(false);
-        content.setPadding(false);
-
-        Details levelDetails = new Details("Details", content);
-        levelDetails.setOpened(false);
+        Component[] fields = new Component[]{username, firstname, lastname, email, password};
 
         formLayout.add(fields);
-        editorDiv.add(formLayout, levelDetails);
+        editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
         splitLayout.addToSecondary(editorLayoutDiv);
     }
@@ -322,5 +310,29 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private void populateForm(Student value) {
         this.student = value;
         binder.readBean(this.student);
+    }
+
+
+
+    private String getStudentMaxAchievement(Student student)
+    {
+        String returnString=ProjectType.Kein.toString();
+        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
+        for(ProjectEntity projectEntity : projectEntities)
+        {
+            if(!returnString.equals(ProjectType.Projekt.toString()) && !returnString.equals(ProjectType.Bachelorarbeit.toString()) && !(returnString.equals(ProjectType.Masterarbeit)) && (projectEntity.getProjectType() == ProjectType.Projekt && projectEntity.isFinished()==true ))
+            {
+                returnString=ProjectType.Projekt.toString();
+            }
+            if(!returnString.equals(ProjectType.Bachelorarbeit.toString()) && !(returnString.equals(ProjectType.Masterarbeit)) && (projectEntity.getProjectType() == ProjectType.Bachelorarbeit && projectEntity.isFinished()==true ))
+            {
+                returnString=ProjectType.Bachelorarbeit.toString();
+            }
+            if(!(returnString.equals(ProjectType.Masterarbeit)) && (projectEntity.getProjectType() == ProjectType.Masterarbeit && projectEntity.isFinished()==true ))
+            {
+                returnString=ProjectType.Masterarbeit.toString();
+            }
+        }
+        return returnString;
     }
 }

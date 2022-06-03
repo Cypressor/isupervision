@@ -1,5 +1,6 @@
 package com.cypress.isupervision.views.bachelorarbeiten;
 
+import com.cypress.isupervision.data.ProjectType;
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
 import com.cypress.isupervision.data.entity.project.ProjectEntity;
 import com.cypress.isupervision.data.entity.user.Student;
@@ -68,20 +69,30 @@ public class BachelorarbeitenStudentenView extends Div
                     if(projectEntityService.get(bachelorsThesisBox.getValue()).getStudent()==null ||projectEntityService.get(bachelorsThesisBox.getValue()).getStudent().equals(""))
                     {
                         List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
-                        for(int i=0;i<projectEntities.size();i++)
+                        List<ProjectEntity> tempEntities = new ArrayList<>();
+                        tempEntities.addAll(projectEntities);
+                        for(int i=0;i<tempEntities.size();i++)
                         {
-                            if(projectEntities.get(i).isFinished())
+                            if(tempEntities.get(i).isFinished())
                             {
-                                projectEntities.remove(projectEntities.get(i));
+                                tempEntities.remove(i);
                                 i--;
                             }
                         }
-                        if (projectEntities.size() > 0)
+                        if (tempEntities.size() > 0)
                         {
                             Notification.show("Sie sind bereits für eine Arbeit angemeldet.");
                         } else
                         {
-                            if (!(studentService.get(authenticatedUser.get().get().getUsername()).getLevel() < 1))
+                            for(int i=0;i<projectEntities.size();i++)
+                            {
+                                if (projectEntities.get(i).getProjectType()!=ProjectType.Projekt)
+                                {
+                                    projectEntities.remove(i);
+                                }
+                            }
+
+                            if (projectEntities.size() > 0)
                             {
                                 warning.open();
                             } else
