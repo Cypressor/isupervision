@@ -3,10 +3,13 @@ package com.cypress.isupervision.data.entity.project;
 import com.cypress.isupervision.data.ProjectType;
 import com.cypress.isupervision.data.entity.AbstractEntity;
 import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.time.LocalDate;
 
 @Entity
-public class ProjectEntity extends AbstractEntity
+@Table(name = "projectentity", uniqueConstraints = {@UniqueConstraint(columnNames = {"title"})})
+public abstract class ProjectEntity extends AbstractEntity
 {
     private String title;
     private String assistant;

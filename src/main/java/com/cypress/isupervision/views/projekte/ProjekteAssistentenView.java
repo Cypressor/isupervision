@@ -249,7 +249,6 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                                 }
                                 if (projects.size()<limit || projectAssistant.equals(authenticatedUser.get().get().getFirstname()+ " " +authenticatedUser.get().get().getLastname()))
                                 {
-
                                     projectService.update(this.project);
                                     clearForm();
                                     refreshGrid();
