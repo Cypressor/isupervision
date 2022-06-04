@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * DataGenerator
+ * generates sample data for testing
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.data.generator;
 
 import com.cypress.isupervision.data.Role;

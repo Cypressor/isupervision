@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * AbstractEntity
+ * abstract entity, all other entities derive from this class
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.data.entity;
 
 import java.util.UUID;

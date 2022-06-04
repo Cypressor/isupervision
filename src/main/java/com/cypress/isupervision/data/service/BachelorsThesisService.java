@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * BachelorsThesisService
+ * Serviceclass, responsible for BachelorThesis objects
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.data.service;
 
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;

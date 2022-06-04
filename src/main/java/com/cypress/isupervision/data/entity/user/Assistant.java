@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * Assistant
+ * extends user, represents an Assistant
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.data.entity.user;
 
 import com.cypress.isupervision.data.Role;

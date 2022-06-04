@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * Student
+ * extends user, represents a Student
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.data.entity.user;
 
 import com.cypress.isupervision.data.Role;
