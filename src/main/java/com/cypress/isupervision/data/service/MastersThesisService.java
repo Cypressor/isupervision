@@ -4,8 +4,6 @@ import com.cypress.isupervision.data.entity.project.MastersThesis;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.cypress.isupervision.data.entity.project.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

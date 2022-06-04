@@ -35,7 +35,6 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -427,5 +426,4 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         icon.getElement().setAttribute("title", label);
         return icon;
     }
-
 }

@@ -12,8 +12,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -28,7 +26,6 @@ import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -204,9 +201,6 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         } catch (ValidationException validationException) {
             Notification.show("Es ist leider etwas schief gegangen.");
         }});
-
-
-
     }
 
     @Override
@@ -311,8 +305,6 @@ public class StudentenView extends Div implements BeforeEnterObserver {
         this.student = value;
         binder.readBean(this.student);
     }
-
-
 
     private String getStudentMaxAchievement(Student student)
     {

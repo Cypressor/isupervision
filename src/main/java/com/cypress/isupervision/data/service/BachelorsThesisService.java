@@ -4,8 +4,6 @@ import com.cypress.isupervision.data.entity.project.BachelorsThesis;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.cypress.isupervision.data.entity.project.MastersThesis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +51,6 @@ public class BachelorsThesisService {
     public int exists(BachelorsThesis bachelorsThesis)
     {
         int exists=0;
-
         BachelorsThesis tempBachelorsThesis = repository.findByTitle(bachelorsThesis.getTitle());
         if (tempBachelorsThesis != null)
         {

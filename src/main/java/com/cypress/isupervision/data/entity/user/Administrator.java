@@ -14,12 +14,10 @@ public class Administrator extends User {
     public Administrator()
     {
         this.setRoles(Set.of(Role.ADMIN, Role.ASSISTANT, Role.STUDENT));
-
         this.projLimit=1000;
         this.baLimit=1000;
         this.maLimit=1000;
     }
-
 
     public Integer getProjLimit() {
         return projLimit;

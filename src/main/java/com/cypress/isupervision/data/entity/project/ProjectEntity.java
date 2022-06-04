@@ -24,12 +24,10 @@ public class ProjectEntity extends AbstractEntity
     {
         return projectType;
     }
-
     public void setProjectType(ProjectType projectType)
     {
         this.projectType = projectType;
     }
-
     public boolean isFinished()
     {
         return isFinished;
@@ -41,9 +39,7 @@ public class ProjectEntity extends AbstractEntity
     public String getTitle() {
         return title;
     }
-    public void setTitle(String titel) {
-        this.title = titel;
-    }
+    public void setTitle(String titel) {this.title = titel;}
     public String getAssistant() {
         return assistant;
     }

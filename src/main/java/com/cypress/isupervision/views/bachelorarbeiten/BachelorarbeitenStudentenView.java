@@ -9,7 +9,6 @@ import com.cypress.isupervision.data.service.ProjectEntityService;
 import com.cypress.isupervision.data.service.StudentService;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
-import com.cypress.isupervision.views.projekte.ProjekteStudentenView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;

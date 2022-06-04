@@ -44,7 +44,6 @@ public class UserService {
     public int exists(User user)
     {
         int exists=0;
-
         User tempUser = repository.findByUsername(user.getUsername());
         if (tempUser != null)
         {
@@ -57,5 +56,4 @@ public class UserService {
         }
         return exists;
     }
-
 }

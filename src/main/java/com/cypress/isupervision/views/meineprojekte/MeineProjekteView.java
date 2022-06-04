@@ -12,12 +12,9 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import java.util.List;
 import javax.annotation.security.PermitAll;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 @PageTitle("Meine Projekte")
 @Route(value = "myprojects", layout = MainLayout.class)
@@ -25,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MeineProjekteView extends Div
 {
     private Grid<MastersThesis> grid = new Grid<>(MastersThesis.class, false);
-
     private MastersThesis mastersThesis;
     private List<Project> projects;
     private List<Project> projects2;

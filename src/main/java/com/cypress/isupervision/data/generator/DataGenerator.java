@@ -8,14 +8,11 @@ import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.entity.project.Project;
 import com.cypress.isupervision.data.entity.user.Student;
 import com.cypress.isupervision.data.service.*;
-import com.sun.source.tree.Tree;
 import com.vaadin.exampledata.DataType;
 import com.vaadin.exampledata.ExampleDataGenerator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-
 import java.time.LocalDateTime;
 import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

@@ -22,7 +22,6 @@ private AuthenticatedUser authenticatedUser;
     public AccountView(AuthenticatedUser authenticatedUser)
     {
         this.authenticatedUser=authenticatedUser;
-
     }
 
     @Override

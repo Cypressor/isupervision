@@ -1,7 +1,6 @@
 package com.cypress.isupervision.data.entity.project;
 
 import com.cypress.isupervision.data.ProjectType;
-
 import javax.persistence.Entity;
 
 @Entity

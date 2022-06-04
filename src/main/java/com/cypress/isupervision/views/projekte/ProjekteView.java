@@ -12,7 +12,6 @@ import java.util.Set;
 import javax.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 @PageTitle("Projekte")
 @Route(value = "projects", layout = MainLayout.class)
 @PermitAll
