@@ -109,7 +109,7 @@ public class ProjekteStudentenView extends Div
     private void configureGrid()
     {
         grid.addColumn("title").setWidth("800px");
-        grid.addColumn("assistant").setAutoWidth(true);
+        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
 
@@ -140,6 +140,12 @@ public class ProjekteStudentenView extends Div
         wrapper.setClassName("grid-wrapper");
         splitLayout.addToPrimary(wrapper);
         wrapper.add(grid);
+    }
+
+    private void refreshGrid()
+    {
+        grid.select(null);
+        grid.getLazyDataView().refreshAll();
     }
 
     private void createProjectBox()

@@ -8,6 +8,7 @@
 
 package com.cypress.isupervision.views.bachelorarbeiten;
 
+import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
 import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.service.AdministratorService;
@@ -21,6 +22,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -51,17 +53,18 @@ import javax.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 
 @PageTitle("Bachelorarbeiten Assistenten")
-@Route(value = "bachelorsthesis/assistant/:bachelorsthesisID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "bachelorstheses/assistant/:bachelorsthesisID?/:action?(edit)", layout = MainLayout.class)
 @RolesAllowed({"ASSISTANT", "ADMIN"})
 public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterObserver
 {
     private final String BACHELORSTHESIS_ID = "bachelorsthesisID";
-    private final String BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE = "bachelorsthesis/assistant/%s/edit";
+    private final String BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE = "bachelorstheses/assistant/%s/edit";
     private final BachelorsThesisService bachelorsThesisService;
+    private AssistantService assistantService;
     private AuthenticatedUser authenticatedUser;
     private Grid<BachelorsThesis> grid = new Grid<>(BachelorsThesis.class, false);
     private TextField title;
-    private TextField assistant;
+    private ComboBox<Assistant> assistant = new ComboBox<>("Assistent");
     private TextField student;
     private DatePicker deadline;
     private Checkbox finished;
@@ -79,6 +82,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
     {
         this.bachelorsThesisService = bachelorsThesisService;
         this.authenticatedUser = authenticatedUser;
+        this.assistantService = assistantService;
         addClassNames("bachelorarbeiten-view");
 
         // Create UI
@@ -90,10 +94,10 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
 
         // Configure Grid
         grid.addColumn("title").setWidth("800px");
-        grid.addColumn("assistant").setAutoWidth(true);
+        grid.addColumn(bachelorsThesis -> bachelorsThesis.getAssistant().getFirstname()+" "+bachelorsThesis.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
-        grid.addComponentColumn(bachelorsThesisFinished -> createFinishedIcon(bachelorsThesisFinished.isFinished())).setHeader("Abgeschlossen");
+        grid.addComponentColumn(bachelorsThesisFinished -> createFinishedIcon(bachelorsThesisFinished.isFinished())).setHeader("Abg.");
 
         grid.getColumnByKey("title").setHeader("Titel");
         grid.getColumnByKey("assistant").setHeader("Assistent");
@@ -144,7 +148,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                     Notification.show("Bitte Titel eintragen.");
                 } else
                 {
-                    if (assistant.getValue().trim().equals(""))
+                    if (assistant.isEmpty())
                     {
                         Notification.show("Bitte Assistent eintragen.");
                     } else
@@ -155,17 +159,17 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                         }
                     }
                 }
-                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(assistant.getValue()))
+                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
                 {
-                    if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
+                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
                     {
                         if (this.bachelorsThesis != null)
                         {
                             int exists = projectEntityService.exists(this.bachelorsThesis);
                             if (exists == 0)
                             {
-                                bachelorsTheses=bachelorsThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
-                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                bachelorsTheses=bachelorsThesisService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
                                 {
 
                                     limit=administratorService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
@@ -205,7 +209,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         //Hook up Delete Button
         delete.addClickListener(e ->
         {
-            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || authenticatedUser.get().get().getUsername().equals(this.bachelorsThesis.getAssistant().getUsername()))
+            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || authenticatedUser.get().get().getUsername().equals(this.bachelorsThesis.getAssistant().getUsername()))
             {
                 warning.open();
             }
@@ -222,7 +226,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
             {
                 if (this.bachelorsThesis != null)
                 {
-                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || authenticatedUser.get().get().getUsername().equals(this.bachelorsThesis.getAssistant().getUsername()))
+                    if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || authenticatedUser.get().get().getUsername().equals(this.bachelorsThesis.getAssistant().getUsername()))
                     {
                         Assistant bachelorsThesisAssistant = this.bachelorsThesis.getAssistant();
                         binder.writeBean(this.bachelorsThesis);
@@ -231,7 +235,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                             Notification.show("Bitte Titel eintragen.");
                         } else
                         {
-                            if (assistant.getValue().trim().equals(""))
+                            if (assistant.isEmpty())
                             {
                                 Notification.show("Bitte Assistent eintragen.");
                             } else
@@ -242,12 +246,12 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                                 }
                             }
                         }
-                        if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(assistant.getValue()))
+                        if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
                         {
-                            if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
+                            if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
                             {
-                                bachelorsTheses=bachelorsThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
-                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                bachelorsTheses=bachelorsThesisService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
                                 {
 
                                     limit=administratorService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
@@ -311,6 +315,15 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         }
     }
 
+    private void createAssistantBox()
+    {
+        assistant.setAllowCustomValue(false);
+        assistant.setPlaceholder("Assistenten auswählen");
+        List<Assistant> assistants = assistantService.getAll();
+        assistant.setItems(assistants);
+        assistant.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
+    }
+
     private void createEditorLayout(SplitLayout splitLayout)
     {
         Div editorLayoutDiv = new Div();
@@ -321,7 +334,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
 
         FormLayout formLayout = new FormLayout();
         title = new TextField("Titel");
-        assistant = new TextField("Assistent");
+        createAssistantBox();
         student = new TextField("Student");
         deadline = new DatePicker("Deadline");
         finished = new Checkbox("Abgeschlossen");
@@ -407,7 +420,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
     {
         if (!authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
         {
-            assistant.setValue(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+            assistant.setValue(assistantService.get(authenticatedUser.get().get().getUsername()));
         }
     }
     private Icon createFinishedIcon(boolean isFinished)

@@ -14,7 +14,7 @@ import java.util.Set;
 
 
 @Entity
-public class Administrator extends User {
+public class Administrator extends Assistant {
 
     private Integer projLimit;
     private Integer baLimit;

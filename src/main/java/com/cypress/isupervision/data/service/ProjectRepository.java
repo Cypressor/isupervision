@@ -21,11 +21,11 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     Project findByTitle(String title);
 
     @Query("select project from Project project " +
-            "where (project.assistant) like :searchTerm")
+            "where (project.assistant) = :searchTerm")
     List<Project> searchForAssistant(@Param("searchTerm") Assistant searchTerm);
 
     @Query("select project from Project project " +
-            "where (project.student) like :searchTerm")
+            "where (project.student) = :searchTerm")
     List<Project> searchForStudent(@Param("searchTerm") String searchTerm);
 
     @Query("select project from Project project " +

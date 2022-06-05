@@ -12,6 +12,8 @@ import com.cypress.isupervision.data.entity.project.MastersThesis;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.cypress.isupervision.data.entity.user.Assistant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +47,7 @@ public class MastersThesisService {
         return repository.findAll(pageable);
     }
 
-    public List<MastersThesis> searchForAssistant(String assistantName) {return repository.searchForAssistant(assistantName);}
+    public List<MastersThesis> searchForAssistant(Assistant assistant) {return repository.searchForAssistant(assistant);}
     public List<MastersThesis> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
 
     public List<MastersThesis> searchOpenProjects() {return repository.searchOpenProjects();}

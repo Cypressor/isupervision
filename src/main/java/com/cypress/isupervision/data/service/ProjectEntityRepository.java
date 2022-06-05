@@ -19,10 +19,10 @@ public interface ProjectEntityRepository extends JpaRepository<ProjectEntity, UU
     ProjectEntity findByTitle(String title);
 
     @Query("select projectEntity from ProjectEntity projectEntity " +
-            "where (projectEntity.assistant) like :searchTerm")
+            "where (projectEntity.assistant) = :searchTerm")
     List<ProjectEntity> searchForAssistant(@Param("searchTerm") String searchTerm);
 
     @Query("select projectEntity from ProjectEntity projectEntity " +
-            "where (projectEntity.student) like :searchTerm")
+            "where (projectEntity.student) = :searchTerm")
     List<ProjectEntity> searchForStudent(@Param("searchTerm") String searchTerm);
 }

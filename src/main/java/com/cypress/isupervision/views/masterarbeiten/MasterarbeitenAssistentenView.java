@@ -8,6 +8,7 @@
 
 package com.cypress.isupervision.views.masterarbeiten;
 
+import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.entity.project.MastersThesis;
 import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.service.AdministratorService;
@@ -21,6 +22,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -51,18 +53,19 @@ import javax.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 
 @PageTitle("Masterarbeiten Assistenten")
-@Route(value = "mastersthesis/assistant/:mastersthesisID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "masterstheses/assistant/:mastersthesisID?/:action?(edit)", layout = MainLayout.class)
 @RolesAllowed({"ASSISTANT", "ADMIN"})
 public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObserver
 {
 
     private final String MASTERSTHESIS_ID = "mastersthesisID";
-    private final String MASTERSTHESIS_EDIT_ROUTE_TEMPLATE = "mastersthesis/assistant/%s/edit";
+    private final String MASTERSTHESIS_EDIT_ROUTE_TEMPLATE = "masterstheses/assistant/%s/edit";
     private final MastersThesisService mastersThesisService;
+    private AssistantService assistantService;
     private AuthenticatedUser authenticatedUser;
     private Grid<MastersThesis> grid = new Grid<>(MastersThesis.class, false);
     private TextField title;
-    private TextField assistant;
+    private ComboBox<Assistant> assistant = new ComboBox<>("Assistent");
     private TextField student;
     private DatePicker deadline;
     private DatePicker examDate;
@@ -81,6 +84,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
     {
         this.authenticatedUser = authenticatedUser;
         this.mastersThesisService = mastersThesisService;
+        this.assistantService = assistantService;
         addClassNames("masterarbeiten-view");
 
         // Create UI
@@ -91,15 +95,14 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("title").setWidth("800px");
-        grid.addColumn("assistant").setAutoWidth(true);
+        grid.addColumn("title").setWidth("750px");
+        grid.addColumn(bachelorsThesis -> bachelorsThesis.getAssistant().getFirstname()+" "+bachelorsThesis.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
         grid.addColumn("examDate").setAutoWidth(true);
-        grid.addComponentColumn(mastersThesisFinished -> createFinishedIcon(mastersThesisFinished.isFinished())).setHeader("Abgeschlossen");
+        grid.addComponentColumn(mastersThesisFinished -> createFinishedIcon(mastersThesisFinished.isFinished())).setHeader("Abg.");
 
         grid.getColumnByKey("title").setHeader("Titel");
-        grid.getColumnByKey("assistant").setHeader("Assistent");
         grid.getColumnByKey("student").setHeader("Student");
         grid.getColumnByKey("deadline").setHeader("Deadline");
         grid.getColumnByKey("examDate").setHeader("Prüfungstermin");
@@ -149,7 +152,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                     Notification.show("Bitte Titel eintragen.");
                 } else
                 {
-                    if (assistant.getValue().trim().equals(""))
+                    if (assistant.isEmpty())
                     {
                         Notification.show("Bitte Assistent eintragen.");
                     } else
@@ -160,17 +163,17 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                         }
                     }
                 }
-                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(assistant.getValue()))
+                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
                 {
-                    if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
+                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
                     {
                         if (this.mastersThesis != null)
                         {
                             int exists = projectEntityService.exists(this.mastersThesis);
                             if (exists == 0)
                             {
-                                mastersTheses=mastersThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
-                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                mastersTheses=mastersThesisService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
                                 {
 
                                     limit=administratorService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
@@ -210,7 +213,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
         //Hook up Delete Button
         delete.addClickListener(e ->
         {
-            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.mastersThesis.getAssistant()))
+            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(this.mastersThesis.getAssistant()))
             {
                 warning.open();
             }
@@ -227,7 +230,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
             {
                 if (this.mastersThesis != null)
                 {
-                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getUsername().equals(this.mastersThesis.getAssistant().getUsername())))
+                    if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || (authenticatedUser.get().get().getUsername().equals(this.mastersThesis.getAssistant().getUsername())))
                     {
                         Assistant mastersThesisAssistant=this.mastersThesis.getAssistant();
                         binder.writeBean(this.mastersThesis);
@@ -236,7 +239,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                             Notification.show("Bitte Titel eintragen.");
                         } else
                         {
-                            if (assistant.getValue().trim().equals(""))
+                            if (assistant.isEmpty())
                             {
                                 Notification.show("Bitte Assistent eintragen.");
                             } else
@@ -247,12 +250,12 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                                 }
                             }
                         }
-                        if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(assistant.getValue()))
+                        if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
                         {
-                            if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
+                            if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
                             {
-                                mastersTheses=mastersThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
-                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                mastersTheses=mastersThesisService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
                                 {
 
                                     limit=administratorService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
@@ -315,6 +318,15 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
         }
     }
 
+    private void createAssistantBox()
+    {
+        assistant.setAllowCustomValue(false);
+        assistant.setPlaceholder("Assistenten auswählen");
+        List<Assistant> assistants = assistantService.getAll();
+        assistant.setItems(assistants);
+        assistant.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
+    }
+
     private void createEditorLayout(SplitLayout splitLayout)
     {
         Div editorLayoutDiv = new Div();
@@ -325,7 +337,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
 
         FormLayout formLayout = new FormLayout();
         title = new TextField("Titel");
-        assistant = new TextField("Assistent");
+        createAssistantBox();
         student = new TextField("Student");
         deadline = new DatePicker("Deadline");
         examDate = new DatePicker("examDate");
@@ -410,9 +422,9 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
 
     private void fillAssistantField()
     {
-        if (!authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+        if (!authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
         {
-            assistant.setValue(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+            assistant.setValue(assistantService.get(authenticatedUser.get().get().getUsername()));
         }
     }
 

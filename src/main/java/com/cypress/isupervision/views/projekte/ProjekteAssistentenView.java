@@ -8,6 +8,7 @@
 
 package com.cypress.isupervision.views.projekte;
 
+import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.entity.project.Project;
 import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.service.AdministratorService;
@@ -40,14 +41,11 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,6 +61,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private final String PROJECT_EDIT_ROUTE_TEMPLATE = "projects/assistant/%s/edit";
     private final ProjectService projectService;
     private AssistantService assistantService;
+    private AuthenticatedUser authenticatedUser;
     private Grid<Project> grid = new Grid<>(Project.class, false);
     private TextField title;
     private ComboBox<Assistant> assistant = new ComboBox<>("Assistent");
@@ -75,7 +74,6 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private Button edit = new Button("Ändern");
     private BeanValidationBinder<Project> binder;
     private Project project;
-    private AuthenticatedUser authenticatedUser;
     private Dialog warning = new Dialog();
     private List<Project> projects;
     private int limit;
@@ -96,10 +94,10 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
 
         // Configure Grid
         grid.addColumn("title").setWidth("800px");
-        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant");
+        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
-        grid.addComponentColumn(projectFinished -> createFinishedIcon(projectFinished.isFinished())).setHeader("Abgeschlossen");
+        grid.addComponentColumn(projectFinished -> createFinishedIcon(projectFinished.isFinished())).setHeader("Abg.");
 
         grid.getColumnByKey("title").setHeader("Titel");
         grid.getColumnByKey("student").setHeader("Student");
@@ -161,7 +159,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                         }
                     }
                 }
-                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(assistant.getValue()))
+                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
                 {
                     if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
                     {
@@ -171,7 +169,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                             if (exists == 0)
                             {
                                 projects=projectService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
-                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
                                 {
 
                                     limit=administratorService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
@@ -211,7 +209,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         //Hook up Delete Button
         delete.addClickListener(e ->
         {
-            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || authenticatedUser.get().get().getUsername().equals(this.project.getAssistant().getUsername()))
+            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || authenticatedUser.get().get().getUsername().equals(this.project.getAssistant().getUsername()))
             {
                 warning.open();
             } else
@@ -227,7 +225,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
             {
                 if (this.project != null)
                 {
-                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || authenticatedUser.get().get().getUsername().equals(this.project.getAssistant().getUsername()))
+                    if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || authenticatedUser.get().get().getUsername().equals(this.project.getAssistant().getUsername()))
                     {
                         Assistant projectAssistant=this.project.getAssistant();
                         binder.writeBean(this.project);
@@ -247,12 +245,12 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                                 }
                             }
                         }
-                        if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(assistant.getValue()))
+                        if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || (assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue())))
                         {
                             if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
                             {
                                 projects=projectService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
-                                if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
                                 {
 
                                     limit=administratorService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
@@ -320,15 +318,9 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     {
         assistant.setAllowCustomValue(false);
         assistant.setPlaceholder("Assistenten auswählen");
-
         List<Assistant> assistants = assistantService.getAll();
-
-        for(Assistant a : assistants)
-        {
-            a.setUsername(a.getFirstname()+ " " + a.getLastname());
-        }
         assistant.setItems(assistants);
-        assistant.setItemLabelGenerator(Assistant::getUsername);
+        assistant.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
     }
 
     private void createEditorLayout(SplitLayout splitLayout)
@@ -425,9 +417,9 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
 
     private void fillAssistantField()
     {
-        if (!authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+        if (!authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
         {
-
+            assistant.setValue(assistantService.get(authenticatedUser.get().get().getUsername()));
         }
     }
     private Icon createFinishedIcon(boolean isFinished)
