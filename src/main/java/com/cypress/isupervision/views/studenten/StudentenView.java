@@ -330,7 +330,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
             }
             if(!(returnString.equals(ProjectType.MASTERSTHESIS)) && (projectEntity.getProjectType() == ProjectType.MASTERSTHESIS && projectEntity.isFinished()==true ))
             {
-                returnString=ProjectType.MASTERSTHESIS.toString();
+                returnString="Masterarbeit";
             }
         }
         return returnString;
