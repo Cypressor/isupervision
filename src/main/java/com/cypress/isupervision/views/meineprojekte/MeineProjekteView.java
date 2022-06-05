@@ -39,11 +39,11 @@ public class MeineProjekteView extends Div
     private List<MastersThesis> mastersTheses2;
 
     @Autowired
-    public MeineProjekteView(AuthenticatedUser authenticatedUser, ProjectService projectService, BachelorsThesisService bachelorsThesisService, MastersThesisService mastersThesisService)
+    public MeineProjekteView(AuthenticatedUser authenticatedUser, ProjectService projectService, BachelorsThesisService bachelorsThesisService, MastersThesisService mastersThesisService, AssistantService assistantService)
     {
         addClassNames("meine-projekte-view");
 
-        projects = projectService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+        projects = projectService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
         projects2 = projectService.searchForStudent(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
         bachelorsTheses = bachelorsThesisService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
         bachelorsTheses2 = bachelorsThesisService.searchForStudent(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());

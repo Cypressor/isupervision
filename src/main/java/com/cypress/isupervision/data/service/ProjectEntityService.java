@@ -37,7 +37,6 @@ public class ProjectEntityService
 
     public ProjectEntity update(ProjectEntity entity) {
         entity.setTitle(entity.getTitle().trim());
-        entity.setAssistant(entity.getAssistant().trim());
         entity.setStudent(entity.getStudent().trim());
         return repository.save(entity);}
 

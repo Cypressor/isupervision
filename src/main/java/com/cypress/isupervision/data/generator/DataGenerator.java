@@ -103,7 +103,7 @@ public class DataGenerator
         {
             mastersThesis = mastersTheses.get(i);
             randomNumber = rng.nextInt(assistants.size());
-            mastersThesis.setAssistant(assistants.get(randomNumber).getFirstname() + " " + assistants.get(randomNumber).getLastname());
+            mastersThesis.setAssistant(assistants.get(randomNumber));
             if(attendants.size()>0)
             {
                 randomNumber = rng.nextInt(attendants.size());
@@ -137,7 +137,7 @@ public class DataGenerator
         {
             bachelorsThesis = bachelorsTheses.get(i);
             randomNumber = rng.nextInt(assistants.size());
-            bachelorsThesis.setAssistant(assistants.get(randomNumber).getFirstname() + " " + assistants.get(randomNumber).getLastname());
+            bachelorsThesis.setAssistant(assistants.get(randomNumber));
             if(attendants.size()>0)
             {
                 randomNumber = rng.nextInt(attendants.size());
@@ -169,7 +169,7 @@ public class DataGenerator
         {
             project = projects.get(i);
             randomNumber = rng.nextInt(assistants.size());
-            project.setAssistant(assistants.get(randomNumber).getFirstname() + " " + assistants.get(randomNumber).getLastname());
+            project.setAssistant(assistants.get(randomNumber));
             randomNumber = rng.nextInt(students.size());
             if(!attendants.contains(students.get(randomNumber)))
             {

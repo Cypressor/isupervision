@@ -9,6 +9,7 @@
 package com.cypress.isupervision.views.masterarbeiten;
 
 import com.cypress.isupervision.data.entity.project.MastersThesis;
+import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.service.AdministratorService;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.MastersThesisService;
@@ -226,9 +227,9 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
             {
                 if (this.mastersThesis != null)
                 {
-                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.mastersThesis.getAssistant()))
+                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getUsername().equals(this.mastersThesis.getAssistant().getUsername())))
                     {
-                        String mastersThesisAssistant=this.mastersThesis.getAssistant();
+                        Assistant mastersThesisAssistant=this.mastersThesis.getAssistant();
                         binder.writeBean(this.mastersThesis);
                         if (title.getValue().trim().equals(""))
                         {
@@ -260,7 +261,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                                 {
                                     limit=assistantService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
                                 }
-                                if (mastersTheses.size()<limit || mastersThesisAssistant.equals(authenticatedUser.get().get().getFirstname()+ " " +authenticatedUser.get().get().getLastname()))
+                                if (mastersTheses.size()<limit || mastersThesisAssistant.getUsername().equals(authenticatedUser.get().get().getUsername()))
                                 {
                                     mastersThesisService.update(this.mastersThesis);
                                     clearForm();

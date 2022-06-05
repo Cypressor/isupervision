@@ -33,7 +33,6 @@ public class BachelorsThesisService {
 
     public BachelorsThesis update(BachelorsThesis entity) {
         entity.setTitle(entity.getTitle().trim());
-        entity.setAssistant(entity.getAssistant().trim());
         entity.setStudent(entity.getStudent().trim());
         return repository.save(entity);
     }

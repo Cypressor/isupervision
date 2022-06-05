@@ -9,6 +9,7 @@
 package com.cypress.isupervision.views.projekte;
 
 import com.cypress.isupervision.data.entity.project.Project;
+import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.service.AdministratorService;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.ProjectEntityService;
@@ -20,6 +21,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -38,11 +40,14 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,9 +62,10 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private final String PROJECT_ID = "projectID";
     private final String PROJECT_EDIT_ROUTE_TEMPLATE = "projects/assistant/%s/edit";
     private final ProjectService projectService;
+    private AssistantService assistantService;
     private Grid<Project> grid = new Grid<>(Project.class, false);
     private TextField title;
-    private TextField assistant;
+    private ComboBox<Assistant> assistant = new ComboBox<>("Assistent");
     private TextField student;
     private DatePicker deadline;
     private Checkbox finished;
@@ -78,6 +84,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     {
         this.authenticatedUser = authenticatedUser;
         this.projectService = projectService;
+        this.assistantService = assistantService;
         addClassNames("projekte-view");
 
         // Create UI
@@ -89,13 +96,12 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
 
         // Configure Grid
         grid.addColumn("title").setWidth("800px");
-        grid.addColumn("assistant").setAutoWidth(true);
+        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant");
         grid.addColumn("student").setAutoWidth(true);
         grid.addColumn("deadline").setAutoWidth(true);
         grid.addComponentColumn(projectFinished -> createFinishedIcon(projectFinished.isFinished())).setHeader("Abgeschlossen");
 
         grid.getColumnByKey("title").setHeader("Titel");
-        grid.getColumnByKey("assistant").setHeader("Assistent");
         grid.getColumnByKey("student").setHeader("Student");
         grid.getColumnByKey("deadline").setHeader("Deadline");
 
@@ -144,7 +150,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                     Notification.show("Bitte Titel eintragen.");
                 } else
                 {
-                    if (assistant.getValue().trim().equals(""))
+                    if (assistant.isEmpty())
                     {
                         Notification.show("Bitte Assistent eintragen.");
                     } else
@@ -157,14 +163,14 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                 }
                 if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(assistant.getValue()))
                 {
-                    if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
+                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
                     {
                         if (this.project != null)
                         {
                             int exists = projectEntityService.exists(this.project);
                             if (exists == 0)
                             {
-                                projects=projectService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+                                projects=projectService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
                                 if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
                                 {
 
@@ -205,7 +211,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         //Hook up Delete Button
         delete.addClickListener(e ->
         {
-            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.project.getAssistant()))
+            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || authenticatedUser.get().get().getUsername().equals(this.project.getAssistant().getUsername()))
             {
                 warning.open();
             } else
@@ -221,16 +227,16 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
             {
                 if (this.project != null)
                 {
-                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.project.getAssistant()))
+                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || authenticatedUser.get().get().getUsername().equals(this.project.getAssistant().getUsername()))
                     {
-                        String projectAssistant=this.project.getAssistant();
+                        Assistant projectAssistant=this.project.getAssistant();
                         binder.writeBean(this.project);
                         if (title.getValue().trim().equals(""))
                         {
                             Notification.show("Bitte Titel eintragen.");
                         } else
                         {
-                            if (assistant.getValue().trim().equals(""))
+                            if (assistant.isEmpty())
                             {
                                 Notification.show("Bitte Assistent eintragen.");
                             } else
@@ -243,9 +249,9 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                         }
                         if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(assistant.getValue()))
                         {
-                            if (!title.getValue().trim().equals("") && !assistant.getValue().trim().equals("") && !deadline.isEmpty())
+                            if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
                             {
-                                projects=projectService.searchForAssistant(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+                                projects=projectService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
                                 if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
                                 {
 
@@ -255,7 +261,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
                                 {
                                     limit=assistantService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
                                 }
-                                if (projects.size()<limit || projectAssistant.equals(authenticatedUser.get().get().getFirstname()+ " " +authenticatedUser.get().get().getLastname()))
+                                if (projects.size()<limit || projectAssistant.getUsername().equals(authenticatedUser.get().get().getUsername()))
                                 {
                                     projectService.update(this.project);
                                     clearForm();
@@ -310,6 +316,21 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         }
     }
 
+    private void createAssistantBox()
+    {
+        assistant.setAllowCustomValue(false);
+        assistant.setPlaceholder("Assistenten auswählen");
+
+        List<Assistant> assistants = assistantService.getAll();
+
+        for(Assistant a : assistants)
+        {
+            a.setUsername(a.getFirstname()+ " " + a.getLastname());
+        }
+        assistant.setItems(assistants);
+        assistant.setItemLabelGenerator(Assistant::getUsername);
+    }
+
     private void createEditorLayout(SplitLayout splitLayout)
     {
         Div editorLayoutDiv = new Div();
@@ -320,7 +341,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
 
         FormLayout formLayout = new FormLayout();
         title = new TextField("Titel");
-        assistant = new TextField("Assistent");
+        createAssistantBox();
         student = new TextField("Student");
         deadline = new DatePicker("Deadline");
         finished = new Checkbox("Abgeschlossen");
@@ -406,7 +427,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     {
         if (!authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
         {
-            assistant.setValue(authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname());
+
         }
     }
     private Icon createFinishedIcon(boolean isFinished)

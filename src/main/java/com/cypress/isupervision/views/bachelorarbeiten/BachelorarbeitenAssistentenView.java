@@ -9,6 +9,7 @@
 package com.cypress.isupervision.views.bachelorarbeiten;
 
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
+import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.service.AdministratorService;
 import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.data.service.BachelorsThesisService;
@@ -204,7 +205,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         //Hook up Delete Button
         delete.addClickListener(e ->
         {
-            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.bachelorsThesis.getAssistant()))
+            if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || authenticatedUser.get().get().getUsername().equals(this.bachelorsThesis.getAssistant().getUsername()))
             {
                 warning.open();
             }
@@ -221,9 +222,9 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
             {
                 if (this.bachelorsThesis != null)
                 {
-                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || (authenticatedUser.get().get().getFirstname() + " " + authenticatedUser.get().get().getLastname()).equals(this.bachelorsThesis.getAssistant()))
+                    if (authenticatedUser.get().get().getRoles().toString().contains("ADMIN") || authenticatedUser.get().get().getUsername().equals(this.bachelorsThesis.getAssistant().getUsername()))
                     {
-                        String bachelorsThesisAssistant = this.bachelorsThesis.getAssistant();
+                        Assistant bachelorsThesisAssistant = this.bachelorsThesis.getAssistant();
                         binder.writeBean(this.bachelorsThesis);
                         if (title.getValue().trim().equals(""))
                         {
@@ -255,7 +256,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                                 {
                                     limit = assistantService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
                                 }
-                                if (bachelorsTheses.size()<limit || bachelorsThesisAssistant.equals(authenticatedUser.get().get().getFirstname()+ " " +authenticatedUser.get().get().getLastname()))
+                                if (bachelorsTheses.size()<limit || bachelorsThesisAssistant.getUsername().equals(authenticatedUser.get().get().getUsername()))
                                 {
                                     bachelorsThesisService.update(this.bachelorsThesis);
                                     clearForm();

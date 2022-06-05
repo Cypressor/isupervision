@@ -10,9 +10,9 @@ package com.cypress.isupervision.data.entity.project;
 
 import com.cypress.isupervision.data.ProjectType;
 import com.cypress.isupervision.data.entity.AbstractEntity;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import com.cypress.isupervision.data.entity.user.Assistant;
+
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -20,7 +20,10 @@ import java.time.LocalDate;
 public abstract class ProjectEntity extends AbstractEntity
 {
     private String title;
-    private String assistant;
+
+    @ManyToOne
+    @JoinColumn(name = "assistant_id")
+    private Assistant assistant;
     private String student;
     private LocalDate deadline;
     private boolean isFinished;
@@ -51,10 +54,10 @@ public abstract class ProjectEntity extends AbstractEntity
         return title;
     }
     public void setTitle(String titel) {this.title = titel;}
-    public String getAssistant() {
+    public Assistant getAssistant() {
         return assistant;
     }
-    public void setAssistant(String assistant) {
+    public void setAssistant(Assistant assistant) {
         this.assistant = assistant;
     }
     public String getStudent() {

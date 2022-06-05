@@ -152,7 +152,7 @@ public class ProjekteStudentenView extends Div
         titleList.add(p.getTitle());
     }
         projectBox.setItems(titleList);
-        add(projectBox);
+
     }
     private void createDialog()
     {

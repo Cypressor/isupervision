@@ -9,6 +9,8 @@
 package com.cypress.isupervision.data.service;
 
 import com.cypress.isupervision.data.entity.user.Assistant;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ public class AssistantService {
     }
 
     public Assistant get(String username) { return repository.findByUsername(username); }
+    public List<Assistant> getAll(){return repository.findAll();}
 
     public Optional<Assistant> get(UUID id) {
         return repository.findById(id);
