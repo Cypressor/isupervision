@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * Application
+ * main function that starts the Spring Boot Application
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision;
 
 import com.vaadin.flow.component.dependency.NpmPackage;

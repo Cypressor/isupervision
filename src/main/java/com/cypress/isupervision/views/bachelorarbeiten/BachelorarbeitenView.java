@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * BachelorarbeitenView
+ * links users to their corresponding bachelorstheses views
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.bachelorarbeiten;
 
 import com.cypress.isupervision.data.Role;

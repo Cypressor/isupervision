@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * ProjekteView
+ * links users to their corresponding project views
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.projekte;
 
 import com.cypress.isupervision.data.Role;

@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * MasterarbeitenView
+ *  links users to their corresponding masterstheses views
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.masterarbeiten;
 
 import com.cypress.isupervision.data.Role;

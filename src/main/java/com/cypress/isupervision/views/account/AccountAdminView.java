@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * AccountAdminView
+ * AccountView for admin users
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.account;
 
 import com.cypress.isupervision.data.entity.user.Administrator;

@@ -160,7 +160,7 @@ public class DataGenerator
                 {
                     attendants.add(students.get(randomNumber));
                     project.setStudent(students.get(randomNumber).getFirstname()+" "+students.get(randomNumber).getLastname());
-                    if((randomNumber%2)==1)
+                    if((randomNumber%4)>0)
                     {
                         finishers.add(students.get(randomNumber));
                         project.setFinished(true);

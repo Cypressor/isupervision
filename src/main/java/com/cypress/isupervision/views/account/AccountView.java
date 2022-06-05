@@ -1,4 +1,13 @@
+/*
+ * iSupervision
+ * AccountView
+ * links users to their corresponding account views
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.account;
+
 import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;

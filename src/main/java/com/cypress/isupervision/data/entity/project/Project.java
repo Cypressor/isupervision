@@ -16,6 +16,6 @@ public class Project extends ProjectEntity
 {
     public Project()
     {
-        this.setProjectType(ProjectType.Projekt);
+        this.setProjectType(ProjectType.PROJECT);
     }
 }

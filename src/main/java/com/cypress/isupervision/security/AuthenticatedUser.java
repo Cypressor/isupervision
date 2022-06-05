@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * AuthenticatedUser
+ * handles user authentication
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.security;
 
 import com.cypress.isupervision.data.entity.user.User;

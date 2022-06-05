@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * MasterarbeitenStudentenView
+ * Masterstheses view for student users
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.masterarbeiten;
 
 import com.cypress.isupervision.data.ProjectType;
@@ -85,7 +93,7 @@ public class MasterarbeitenStudentenView extends Div
                         {
                             for(int i=0;i<projectEntities.size();i++)
                             {
-                                if (projectEntities.get(i).getProjectType()!= ProjectType.Bachelorarbeit)
+                                if (projectEntities.get(i).getProjectType()!= ProjectType.BACHELORSTHESIS)
                                 {
                                     projectEntities.remove(i);
                                 }

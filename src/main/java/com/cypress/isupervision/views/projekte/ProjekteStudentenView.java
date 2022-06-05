@@ -1,4 +1,13 @@
+/*
+ * iSupervision
+ * ProjekteStudentenView
+ * Projekte view for assistant users
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.projekte;
+
 import com.cypress.isupervision.data.entity.project.Project;
 import com.cypress.isupervision.data.entity.project.ProjectEntity;
 import com.cypress.isupervision.data.entity.user.Student;

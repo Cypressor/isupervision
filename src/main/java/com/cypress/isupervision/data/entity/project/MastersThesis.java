@@ -19,7 +19,7 @@ public class MastersThesis extends ProjectEntity
 
     public MastersThesis()
     {
-        this.setProjectType(ProjectType.Masterarbeit);
+        this.setProjectType(ProjectType.MASTERSTHESIS);
     }
 
     public LocalDate getExamDate()

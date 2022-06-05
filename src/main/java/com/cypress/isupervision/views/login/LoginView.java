@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * LoginView
+ * handles login and links to registration form
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.login;
 
 import com.cypress.isupervision.data.service.AssistantService;

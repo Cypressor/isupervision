@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * AssistentenView
+ * an editable list of assistants, only for administrators to view.
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.assistenten;
 
 import com.cypress.isupervision.data.entity.user.Assistant;

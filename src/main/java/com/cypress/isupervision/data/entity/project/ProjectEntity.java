@@ -24,7 +24,7 @@ public abstract class ProjectEntity extends AbstractEntity
     private String student;
     private LocalDate deadline;
     private boolean isFinished;
-    private ProjectType projectType = ProjectType.Projekt;
+    private ProjectType projectType = ProjectType.PROJECT;
 
     public ProjectEntity()
     {

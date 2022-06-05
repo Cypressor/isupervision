@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * MeineProjekteView
+ * shows users their ongoing projects
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.meineprojekte;
 
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;

@@ -1,6 +1,14 @@
+/*
+ * iSupervision
+ * ProjectType
+ * Enum, used for setting the project type
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.data;
 
 public enum ProjectType
 {
-    Kein,Projekt,Bachelorarbeit,Masterarbeit;
+    NONE,PROJECT,BACHELORSTHESIS,MASTERSTHESIS;
 }

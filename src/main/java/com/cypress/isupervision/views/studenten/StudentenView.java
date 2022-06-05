@@ -1,3 +1,11 @@
+/*
+ * iSupervision
+ * StudentenView
+ * an editable list of students, only for administrators to view.
+ * Author: Martin Lunelli
+ * Last Change: 04.06.2022
+ */
+
 package com.cypress.isupervision.views.studenten;
 
 import com.cypress.isupervision.data.ProjectType;
@@ -308,21 +316,21 @@ public class StudentenView extends Div implements BeforeEnterObserver {
 
     private String getStudentMaxAchievement(Student student)
     {
-        String returnString=ProjectType.Kein.toString();
+        String returnString="Kein";
         List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
         for(ProjectEntity projectEntity : projectEntities)
         {
-            if(!returnString.equals(ProjectType.Projekt.toString()) && !returnString.equals(ProjectType.Bachelorarbeit.toString()) && !(returnString.equals(ProjectType.Masterarbeit)) && (projectEntity.getProjectType() == ProjectType.Projekt && projectEntity.isFinished()==true ))
+            if(!returnString.equals(ProjectType.PROJECT.toString()) && !returnString.equals(ProjectType.BACHELORSTHESIS.toString()) && !(returnString.equals(ProjectType.MASTERSTHESIS)) && (projectEntity.getProjectType() == ProjectType.PROJECT && projectEntity.isFinished()==true ))
             {
-                returnString=ProjectType.Projekt.toString();
+                returnString="Projekt";
             }
-            if(!returnString.equals(ProjectType.Bachelorarbeit.toString()) && !(returnString.equals(ProjectType.Masterarbeit)) && (projectEntity.getProjectType() == ProjectType.Bachelorarbeit && projectEntity.isFinished()==true ))
+            if(!returnString.equals(ProjectType.BACHELORSTHESIS.toString()) && !(returnString.equals(ProjectType.MASTERSTHESIS)) && (projectEntity.getProjectType() == ProjectType.BACHELORSTHESIS && projectEntity.isFinished()==true ))
             {
-                returnString=ProjectType.Bachelorarbeit.toString();
+                returnString="Bachelorarbeit";
             }
-            if(!(returnString.equals(ProjectType.Masterarbeit)) && (projectEntity.getProjectType() == ProjectType.Masterarbeit && projectEntity.isFinished()==true ))
+            if(!(returnString.equals(ProjectType.MASTERSTHESIS)) && (projectEntity.getProjectType() == ProjectType.MASTERSTHESIS && projectEntity.isFinished()==true ))
             {
-                returnString=ProjectType.Masterarbeit.toString();
+                returnString=ProjectType.MASTERSTHESIS.toString();
             }
         }
         return returnString;
