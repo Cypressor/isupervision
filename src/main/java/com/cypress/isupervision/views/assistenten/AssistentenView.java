@@ -65,7 +65,6 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
 
     private Button cancel = new Button("Abbrechen");
     private Button save = new Button("Speichern");
-    private Button delete = new Button("Löschen");
     private Button edit = new Button("Ändern");
 
     private BeanValidationBinder<Assistant> binder;
@@ -83,7 +82,6 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         SplitLayout splitLayout = new SplitLayout();
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
-        createDialog();
         add(splitLayout);
         createGrid();
         //Hook up buttons
@@ -91,7 +89,6 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         configureBinder();
         cancelButtonListener();
         saveButtonListener();
-        deleteButtonListener();
         editButtonListener();
     }
 
@@ -122,14 +119,7 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
             }});
     }
 
-    private void deleteButtonListener()
-    {
-        //Hook up Delete Button
-        delete.addClickListener(e -> {
-            warning.open();
-        });
 
-    }
 
     private void saveButtonListener()
     {
@@ -287,12 +277,12 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         VerticalLayout buttonLayout2 = new VerticalLayout();
         buttonLayout1.setClassName("button-layout1");
         buttonLayout2.setClassName("button-layout2");
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         edit.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttonLayout1.add(save, cancel );
-        buttonLayout2.add(edit,delete);
+        buttonLayout2.add(edit);
         HorizontalLayout greaterButtonLayout= new HorizontalLayout();
         buttonLayout2.setAlignItems(FlexComponent.Alignment.STRETCH);
         buttonLayout1.setAlignItems(FlexComponent.Alignment.STRETCH);
@@ -301,29 +291,8 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(greaterButtonLayout);
     }
 
-    private void createDialog()
-    {
-        warning.add(new H4("Löschen"));
-        warning.add(new Paragraph("Sind Sie sich sicher, dass Sie diesen Assistenten löschen möchten?"));
-        Button delete = new Button("Löschen");
-        Button cancel = new Button("Abbrechen");
-        warning.add(delete, cancel);
-        delete.addClickListener(event -> {confirmDelete();});
-        cancel.addClickListener(event->{cancelDelete();});
-    }
-    private void confirmDelete()
-    {
-        binder.readBean(this.assistant);
-        assistantService.delete(this.assistant.getId());
-        refreshGrid();
-        Notification.show("Assistent wurde gelöscht.");
-        warning.close();
-    }
-    private void cancelDelete()
-    {
-        Notification.show("Löschen wurde abgebrochen.");
-        warning.close();
-    }
+
+
 
     private void createGridLayout(SplitLayout splitLayout) {
         Div wrapper = new Div();
