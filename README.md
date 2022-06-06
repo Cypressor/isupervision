@@ -1,7 +1,7 @@
 
 # iSupervision README
 ## Introduction:
-This application has been created as a part of the exercise course "Objektorientierte Programmierung", wich contributes to the study course "Business Software Development" at FH Campus02.
+This application has been created as part of the exercise course "Objektorientierte Programmierung", wich contributes to the study course "Business Software Development" at FH Campus02.
 This is an experimental version of a business software application and should be treated as such. Be aware that this version of the software is not meant to be used in a real world scenario.
 When using this software, be aware that data like passwords are intentionally not handled securely within the application to simplify the process of testing.
 
@@ -66,7 +66,7 @@ When testing, be sure to note your credentials in case you might need them at a 
   If you don't know the name of the account you are using, click on the "Abbrechen"-Button, then the name should be filled in automatically.
   Additionally, you can log in  with the admin account and take a look at the "Assistenten" tab. The application has been designed like this, because
   in a real world application a user would surely always know his full name.
-- The fields "Titel", "Assistent" and "Deadline" are mandatory to be filled out at to create a project.
+- The fields "Titel", "Assistent" and "Deadline" are mandatory to be filled out to create a project.
 - The "Student" field is not meant to be filled out at project creation, because the students are supposed to sign up for the projects themselves. Feel free to fill the "Student"-field if needed tho.
 - The "Prüfungstermin" field of "Masterarbeiten" is not mandatory to be filled out. It is supposed to be edited at a later point in time, because the date of exam might not be known at the time of project creation.
 
@@ -86,7 +86,7 @@ When testing, be sure to note your credentials in case you might need them at a 
 - full name: stu dent
 ### Additional users:
 If you want to take a look at additional user data, log in with admin account and look at the "Studenten"/"Assistenten" tabs.
-There are alot of test users generated beforehand that can be used for testing.
+There are lots of test users generated beforehand that can be used for testing.
 The unhashed passwords are intentionally stored and shown in the "Studenten"/"Assistenten" view, just to make testing easier.
 I am totally aware that this shouldn't be the case in any proper application.
 
@@ -102,25 +102,24 @@ I am totally aware that this shouldn't be the case in any proper application.
 ### Assistants:
 - Are meant as project-assistants.
 - Can see all projects/bachelortheses/mastertheses.
-- Can only create, edit or delete projects if the assistant property of the Project is the Full Name of the Assistant (FirstName + " " + Lastname).
+- Can only create, edit or delete projects, if the assistant property of the Project is the full name of the Assistant (FirstName + " " + Lastname).
 - Can adjust their project-limits in the Account section.
 
 ### Students:
-- Can only see the projects/bachelorstheses/mastertheses where no student is assigned to yet. Can additionally see the project they are assigned to in the "Meine Projekte" tab.
-- Can signup for project/bachelorsthesis/mastersthesis depending on their level.
+- Can only see the projects/bachelorstheses/mastertheses where no student is assigned to yet. Can additionally see the projects they are assigned to in the "Meine Projekte" tab.
+- Can signup for project/bachelorsthesis/mastersthesis depending on their completed projects.
 - Can only have one active project/bachelorsthesis/mastersthesis at a time.
 
-### Projects, Bachelorstheses and Mastertheses:
-- Have a title, student, assistant and deadline.
-- Mastertheses additionaly has an examDate.
-- Students and assistants are implemented as Strings (would be handled differently in future applications, read more about this issue in the comments.)
+### Projects, Bachelorstheses and Masterstheses:
+- Have a title, student, assistant deadline and projectType.
+- Masterstheses additionally have an examDate.
 
 ***
 
 ## Comments:
 
 ### Unhashed passwords being stored:
-The unhashed passwords are intentionally stored and shown in the "Studenten"/"Assistenten" view, just to make testing easier.
+The unhashed passwords are intentionally stored and shown to the admin in the "Studenten"/"Assistenten" view, just to make testing easier.
 I am totally aware that this shouldn't be the case in any proper application.
 
 ### English/German:
