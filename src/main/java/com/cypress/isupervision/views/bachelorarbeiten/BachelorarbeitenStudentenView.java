@@ -130,7 +130,7 @@ public class BachelorarbeitenStudentenView extends Div
     private void configureGrid()
     {
         grid.addColumn("title").setWidth("800px");
-        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname(),"assistant.firstname")
+        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname(), "assistant.firstname")
                 .setHeader("Assistent")
                 .setKey("assistant")
                 .setAutoWidth(true)

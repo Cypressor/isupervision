@@ -138,7 +138,6 @@ public class MasterarbeitenStudentenView extends Div
         grid.addColumn("examDate").setAutoWidth(true);
 
         grid.getColumnByKey("title").setHeader("Titel");
-        grid.getColumnByKey("assistant").setHeader("Assistent");
         grid.getColumnByKey("deadline").setHeader("Deadline");
         grid.getColumnByKey("examDate").setHeader("Prüfungsdatum");
     }

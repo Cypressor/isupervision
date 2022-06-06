@@ -8,7 +8,10 @@
 
 package com.cypress.isupervision.views.projekte;
 
+import com.cypress.isupervision.data.AssistantComparator;
+import com.cypress.isupervision.data.ProjectEntityAssistantComparator;
 import com.cypress.isupervision.data.Role;
+import com.cypress.isupervision.data.StudentComparator;
 import com.cypress.isupervision.data.entity.project.Project;
 import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.entity.user.Student;
@@ -44,9 +47,8 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 import javax.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 
@@ -371,6 +373,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         assistant.setAllowCustomValue(false);
         assistant.setPlaceholder("Assistent auswählen");
         List<Assistant> assistants = assistantService.getAll();
+        assistants.sort(new AssistantComparator());
         assistant.setItems(assistants);
         assistant.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
     }
@@ -380,6 +383,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         student.setAllowCustomValue(false);
         student.setPlaceholder("Student auswählen");
         List<Student> students = studentService.getAll();
+        students.sort(new StudentComparator());
         student.setItems(students);
         student.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
     }

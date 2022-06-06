@@ -8,7 +8,9 @@
 
 package com.cypress.isupervision.views.bachelorarbeiten;
 
+import com.cypress.isupervision.data.AssistantComparator;
 import com.cypress.isupervision.data.Role;
+import com.cypress.isupervision.data.StudentComparator;
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
 import com.cypress.isupervision.data.entity.project.Project;
 import com.cypress.isupervision.data.entity.user.Assistant;
@@ -371,6 +373,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         assistant.setAllowCustomValue(false);
         assistant.setPlaceholder("Assistenten auswählen");
         List<Assistant> assistants = assistantService.getAll();
+        assistants.sort(new AssistantComparator());
         assistant.setItems(assistants);
         assistant.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
     }
@@ -380,6 +383,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         student.setAllowCustomValue(false);
         student.setPlaceholder("Student auswählen");
         List<Student> students = studentService.getAll();
+        students.sort(new StudentComparator());
         student.setItems(students);
         student.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
     }
