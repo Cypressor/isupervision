@@ -1,3 +1,4 @@
+
 # iSupervision README
 ## Introduction:
 This application has been created as a part of the exercise course "Objektorientierte Programmierung", wich contributes to the study course "Business Software Development" at FH Campus02.
@@ -12,7 +13,7 @@ Maven, Spring Boot, Spring Security, Spring JPA, Vaadin.
 ## Troubleshooting:
 
 ### Logger prints out "node.exe cannot be found" during the first time of building the project in IntelliJ:
-vaadin is probably failing to install npm. To resolve this issue please try the following:
+the framework is probably failing to install npm. To resolve this issue please try the following:
 
 try to install node.js and npm:
 
@@ -25,12 +26,9 @@ after installing node.js, intellij might ask you to install npm. in this case in
 There is an issue where the password manager of the browser may save the wrong fields of the registration form. If you run into issues logging in, try to not use the password manager and do input your login credentials manually.
 
 ### Troubles with filling in the assistant name at project creation:
-Be sure to add the full name of the assistant, wich is not the username.
-It consists of "FirstName" + " " + "LastName".
 If you don't know the name of the account you are using, click on the "Abbrechen"-Button,  then the name should be filled in automatically.
 Additionally, you can log in  with the admin account and take a look at the "Assistenten" tab. The application has been designed like this, because
 in a real world application a user would surely always know his full name.
-
 
 ***
 
@@ -63,7 +61,6 @@ When testing, be sure to note your credentials in case you might need them at a 
 
 ***
 ## Creating, editing and deleting projects
-- When creating a project, be sure the "Assistent" field is filled out. "Assistent" is defined by Firstname + " " + Lastname.
 - Admins can put any name into the "Assistent" field.
 - Assistants can only put their own full name into the assistant field. If you are testing, you might not know the full name of the account.
   If you don't know the name of the account you are using, click on the "Abbrechen"-Button, then the name should be filled in automatically.
@@ -106,7 +103,6 @@ I am totally aware that this shouldn't be the case in any proper application.
 - Are meant as project-assistants.
 - Can see all projects/bachelortheses/mastertheses.
 - Can only create, edit or delete projects if the assistant property of the Project is the Full Name of the Assistant (FirstName + " " + Lastname).
-I could have created an extra view for the assistants, where this is done automatically, but that would have required quite alot of extra work.
 - Can adjust their project-limits in the Account section.
 
 ### Students:
@@ -135,14 +131,6 @@ All the class names of the Views are German. This is because the application is 
 This project was quite a learning experience for me. This was my first time working with Maven, Spring Boot, Spring Security, Spring JPA and Vaadin.
 For that reason I focused more on learning about the framework than writing perfectly clean code.
 The quality of the code is therefore not the best, due to the lack of experience and time. Still, the functionalities are working and all requirements are met.
-If I'd have another shot at it, I would put more effort into the entities as well as classes and interfaces to improve the quality of the code.
-
-
-### Regarding entities:
-The Project-Entities could have been done a lot better. (For example: ProjectEntity.assistant and ProjectEntity.student are Strings and could be replaced with an Assistant/Student-Object).
-Unfortunately I wasn't aware of this issue at the start of the project.
-Having that said, there was not enough time to refactor and therefore enhance the quality of the entities and change the code at every occurrence.
-When developing a similar application in the future, I would spend more time on designing the entities beforehand. 
 
 ### Regarding classes in general:
 There is quite a lot of code repetition throughout the entire project. This happened due to a lack of experience with the framework and web development in general.

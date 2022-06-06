@@ -151,7 +151,8 @@ public class BachelorarbeitenStudentenView extends Div
         FormLayout formLayout = new FormLayout();
         createMasterThesisBox();
 
-        Span warning = new Span("Die Anmeldung kann nicht rückgängig gemacht werden. Bei einer fehlerhaften Anmeldung kontaktieren Sie bitte den zuständigen Projektassistenten, oder einen Administrator.");
+        Span warning = new Span("Die Anmeldung kann nicht rückgängig gemacht werden. " +
+                "Bei einer fehlerhaften Anmeldung kontaktieren Sie bitte den zuständigen Projektassistenten, oder einen Administrator.");
         formLayout.add(bachelorsThesisBox,signup, warning);
         editorDiv.add(formLayout);
         splitLayout.addToSecondary(editorLayoutDiv);
