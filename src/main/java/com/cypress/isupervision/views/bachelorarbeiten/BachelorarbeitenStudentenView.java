@@ -42,20 +42,21 @@ import java.util.List;
 public class BachelorarbeitenStudentenView extends Div
 {
     private Grid<BachelorsThesis> grid = new Grid<>(BachelorsThesis.class, false);
-    private AuthenticatedUser authenticatedUser;
     private List<BachelorsThesis> bachelorsTheses;
     private BachelorsThesis bachelorsThesis;
     private ComboBox<String> bachelorsThesisBox = new ComboBox("Bachelorarbeit-Anmeldung");
     private Button signup = new Button("Anmelden");
     private Dialog warning = new Dialog();
     private Student student;
-    private BachelorsThesisService bachelorsThesisService;
+    private final BachelorsThesisService bachelorsThesisService;
+    private final ProjectEntityService projectEntityService;
 
     @Autowired
     BachelorarbeitenStudentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService, StudentService studentService)
     {
         addClassNames("bachelorarbeiten-view");
         this.bachelorsThesisService=bachelorsThesisService;
+        this.projectEntityService=projectEntityService;
         student = studentService.get(authenticatedUser.get().get().getUsername());
 
         // Create UI
@@ -67,7 +68,11 @@ public class BachelorarbeitenStudentenView extends Div
         add(splitLayout);
         configureGrid();
         grid.setItems(bachelorsTheses);
+        signupButtonListener();
+    }
 
+    private void signupButtonListener()
+    {
         signup.addClickListener(e->{
             if(!bachelorsThesisBox.isEmpty())
             {
@@ -75,7 +80,7 @@ public class BachelorarbeitenStudentenView extends Div
                 {
                     if(projectEntityService.get(bachelorsThesisBox.getValue()).getStudent()==null ||projectEntityService.get(bachelorsThesisBox.getValue()).getStudent().equals(""))
                     {
-                        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
+                        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student);
                         List<ProjectEntity> tempEntities = new ArrayList<>();
                         tempEntities.addAll(projectEntities);
                         for(int i=0;i<tempEntities.size();i++)
@@ -125,13 +130,13 @@ public class BachelorarbeitenStudentenView extends Div
     private void configureGrid()
     {
         grid.addColumn("title").setWidth("800px");
-        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
-        grid.addColumn("student").setAutoWidth(true);
+        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname(),"assistant.firstname")
+                .setHeader("Assistent")
+                .setKey("assistant")
+                .setAutoWidth(true)
+                .setSortable(true);
         grid.addColumn("deadline").setAutoWidth(true);
-
         grid.getColumnByKey("title").setHeader("Titel");
-        grid.getColumnByKey("assistant").setHeader("Assistent");
-        grid.getColumnByKey("student").setHeader("Student");
         grid.getColumnByKey("deadline").setHeader("Deadline");
 
     }
@@ -190,7 +195,7 @@ public class BachelorarbeitenStudentenView extends Div
                 bachelorsThesis=m;
             }
         }
-        bachelorsThesis.setStudent(student.getFirstname()+ " " + student.getLastname());
+        bachelorsThesis.setStudent(student);
         bachelorsThesisService.update(bachelorsThesis);
         Notification.show("Du wurdest für die Bachelorarbeit angemeldet.");
         warning.close();

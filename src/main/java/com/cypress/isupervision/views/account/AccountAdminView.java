@@ -13,6 +13,8 @@ import com.cypress.isupervision.data.service.AdministratorService;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.charts.model.HorizontalAlign;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -57,11 +59,14 @@ public class AccountAdminView extends VerticalLayout
 
     private void createLayout()
     {
+        H1 greeting = new H1("Hello" + " " + admin.getFirstname() + " " + admin.getLastname());
         VerticalLayout fieldLayout = new VerticalLayout();
-        fieldLayout.add(projLimit,baLimit,maLimit,saveButton);
+        fieldLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         projLimit.setValue(admin.getProjLimit().toString());
         baLimit.setValue(admin.getBaLimit().toString());
         maLimit.setValue(admin.getMaLimit().toString());
+        fieldLayout.add(greeting,projLimit,baLimit,maLimit,saveButton);
         add(fieldLayout);
+
     }
 }

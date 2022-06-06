@@ -41,6 +41,10 @@ public class RegistrationView extends VerticalLayout
     final String KEY_STUDENT = "FH02student";
     final String KEY_ASSISTENT = "FH02assistent";
     private BeanValidationBinder<User> userBinder;
+    private final UserService userService;
+    private final StudentService studentService;
+    private final AssistantService assistantService;
+    private final PasswordEncoder passwordEncoder;
     private Student student;
     private Assistant assistant;
     private TextField username = new TextField("Benutzername");
@@ -55,14 +59,21 @@ public class RegistrationView extends VerticalLayout
 
     RegistrationView(StudentService studentService, AssistantService assistantService, UserService userService, PasswordEncoder passwordEncoder)
     {
-        createRegistrationForm();
+        this.userService=userService;
+        this.studentService=studentService;
+        this.assistantService=assistantService;
+        this.passwordEncoder=passwordEncoder;
 
+        createRegistrationForm();
         // Configure Form
         userBinder = new BeanValidationBinder<>(User.class);
-
         // Bind fields. This is where you'd define e.g. validation rules
         userBinder.bindInstanceFields(this);
+        registerButtonListener();
+    }
 
+    private void registerButtonListener()
+    {
         registerButton.addClickListener(e -> {
             try
             {
@@ -128,7 +139,7 @@ public class RegistrationView extends VerticalLayout
                     }
                     else
                     {
-                            Notification.show("Rolle und Schlüssel passen nicht zusammen.");
+                        Notification.show("Rolle und Schlüssel passen nicht zusammen.");
                     }
                 }
             }

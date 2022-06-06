@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.cypress.isupervision.data.entity.user.Assistant;
+import com.cypress.isupervision.data.entity.user.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,13 +38,12 @@ public class ProjectService  {
 
     public Project update(Project entity) {
         entity.setTitle(entity.getTitle().trim());
-        entity.setStudent(entity.getStudent().trim());
         return repository.save(entity);
     }
 
     public List<Project> searchForAssistant(Assistant assistant) {return repository.searchForAssistant(assistant);}
 
-    public List<Project> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
+    public List<Project> searchForStudent(Student student) {return repository.searchForStudent(student);}
 
     public List<Project> searchOpenProjects() {return repository.searchOpenProjects();}
 

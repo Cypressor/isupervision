@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.cypress.isupervision.data.entity.user.Assistant;
+import com.cypress.isupervision.data.entity.user.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,6 @@ public class MastersThesisService {
 
     public MastersThesis update(MastersThesis entity) {
         entity.setTitle(entity.getTitle().trim());
-        entity.setStudent(entity.getStudent().trim());
         return repository.save(entity);
     }
 
@@ -48,7 +48,7 @@ public class MastersThesisService {
     }
 
     public List<MastersThesis> searchForAssistant(Assistant assistant) {return repository.searchForAssistant(assistant);}
-    public List<MastersThesis> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
+    public List<MastersThesis> searchForStudent(Student student) {return repository.searchForStudent(student);}
 
     public List<MastersThesis> searchOpenProjects() {return repository.searchOpenProjects();}
 

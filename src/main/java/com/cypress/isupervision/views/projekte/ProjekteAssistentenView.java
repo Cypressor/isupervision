@@ -11,10 +11,8 @@ package com.cypress.isupervision.views.projekte;
 import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.entity.project.Project;
 import com.cypress.isupervision.data.entity.user.Assistant;
-import com.cypress.isupervision.data.service.AdministratorService;
-import com.cypress.isupervision.data.service.AssistantService;
-import com.cypress.isupervision.data.service.ProjectEntityService;
-import com.cypress.isupervision.data.service.ProjectService;
+import com.cypress.isupervision.data.entity.user.Student;
+import com.cypress.isupervision.data.service.*;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -60,12 +58,15 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private final String PROJECT_ID = "projectID";
     private final String PROJECT_EDIT_ROUTE_TEMPLATE = "projects/assistant/%s/edit";
     private final ProjectService projectService;
-    private AssistantService assistantService;
-    private AuthenticatedUser authenticatedUser;
+    private final AssistantService assistantService;
+    private final StudentService studentService;
+    private final AuthenticatedUser authenticatedUser;
+    private final ProjectEntityService projectEntityService;
+    private final AdministratorService administratorService;
     private Grid<Project> grid = new Grid<>(Project.class, false);
     private TextField title;
     private ComboBox<Assistant> assistant = new ComboBox<>("Assistent");
-    private TextField student;
+    private ComboBox<Student> student = new ComboBox<>("Student (optional)");
     private DatePicker deadline;
     private Checkbox finished;
     private Button cancel = new Button("Abbrechen");
@@ -78,11 +79,14 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
     private List<Project> projects;
     private int limit;
 
-    public ProjekteAssistentenView(AuthenticatedUser authenticatedUser, ProjectService projectService, ProjectEntityService projectEntityService, AssistantService assistantService, AdministratorService administratorService)
+    public ProjekteAssistentenView(AuthenticatedUser authenticatedUser, ProjectService projectService, ProjectEntityService projectEntityService, StudentService studentService, AssistantService assistantService, AdministratorService administratorService)
     {
         this.authenticatedUser = authenticatedUser;
         this.projectService = projectService;
         this.assistantService = assistantService;
+        this.studentService = studentService;
+        this.projectEntityService = projectEntityService;
+        this.administratorService = administratorService;
         addClassNames("projekte-view");
 
         // Create UI
@@ -91,133 +95,19 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         createEditorLayout(splitLayout);
         createDialog();
         add(splitLayout);
-
-        // Configure Grid
-        grid.addColumn("title").setWidth("800px");
-        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
-        grid.addColumn("student").setAutoWidth(true);
-        grid.addColumn("deadline").setAutoWidth(true);
-        grid.addComponentColumn(projectFinished -> createFinishedIcon(projectFinished.isFinished())).setHeader("Abg.");
-
-        grid.getColumnByKey("title").setHeader("Titel");
-        grid.getColumnByKey("student").setHeader("Student");
-        grid.getColumnByKey("deadline").setHeader("Deadline");
-
-        grid.setItems(query -> projectService.list(
-                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-                .stream());
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event ->
-        {
-            if (event.getValue() != null)
-            {
-                UI.getCurrent().navigate(String.format(PROJECT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
-            } else
-            {
-                clearForm();
-                UI.getCurrent().navigate(ProjekteAssistentenView.class);
-            }
-        });
+        createGrid();
+        //Hook up buttons
+        reactToGridSelection();
         fillAssistantField();
+        configureBinder();
+        cancelButtonListener();
+        saveButtonListener();
+        deleteButtonListener();
+        editButtonListener();
+    }
 
-        // Configure Form
-        binder = new BeanValidationBinder<>(Project.class);
-
-        // Bind fields. This is where you'd define e.g. validation rules
-        binder.bindInstanceFields(this);
-
-        //Hook up Cancel Button
-        cancel.addClickListener(e ->
-        {
-            clearForm();
-            refreshGrid();
-        });
-
-        //Hook up Save Button
-        save.addClickListener(e ->
-        {
-            try
-            {
-                this.project = new Project();
-                binder.writeBean(this.project);
-
-                if (title.getValue().trim().equals(""))
-                {
-                    Notification.show("Bitte Titel eintragen.");
-                } else
-                {
-                    if (assistant.isEmpty())
-                    {
-                        Notification.show("Bitte Assistent eintragen.");
-                    } else
-                    {
-                        if (deadline.isEmpty())
-                        {
-                            Notification.show("Bitte Deadline eintragen.");
-                        }
-                    }
-                }
-                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
-                {
-                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
-                    {
-                        if (this.project != null)
-                        {
-                            int exists = projectEntityService.exists(this.project);
-                            if (exists == 0)
-                            {
-                                projects=projectService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
-                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
-                                {
-
-                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
-                                }
-                                else
-                                {
-                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
-                                }
-                                if (projects.size()<limit)
-                                {
-                                projectService.update(this.project);
-                                clearForm();
-                                refreshGrid();
-                                Notification.show("Projekt gespeichert.");
-                                }
-                                else
-                                {
-                                    Notification.show("Ihr Limit an Projekten ist bereits erreicht.");
-                                }
-                            } else
-                            {
-                                Notification.show("Titel existiert bereits.");
-                            }
-                        }
-                    }
-                } else
-                {
-                    Notification.show("Assistenten dürfen nur Projekte auf ihren eigenen Namen buchen.");
-                }
-                UI.getCurrent().navigate(ProjekteAssistentenView.class);
-            } catch (ValidationException validationException)
-            {
-                Notification.show("Es ist leider etwas schief gegangen.");
-            }
-        });
-
-        //Hook up Delete Button
-        delete.addClickListener(e ->
-        {
-            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || authenticatedUser.get().get().getUsername().equals(this.project.getAssistant().getUsername()))
-            {
-                warning.open();
-            } else
-            {
-                Notification.show("Assistenten dürfen ihre eigenen Projekte löschen.");
-            }
-        });
-
+    private void editButtonListener()
+    {
         //Hook up Edit Button
         edit.addClickListener(e ->
         {
@@ -292,6 +182,157 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         });
     }
 
+    private void deleteButtonListener()
+    {
+        //Hook up Delete Button
+        delete.addClickListener(e ->
+        {
+            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || authenticatedUser.get().get().getUsername().equals(this.project.getAssistant().getUsername()))
+            {
+                warning.open();
+            } else
+            {
+                Notification.show("Assistenten dürfen ihre eigenen Projekte löschen.");
+            }
+        });
+    }
+
+    private void saveButtonListener()
+    {
+        //Hook up Save Button
+        save.addClickListener(e ->
+        {
+            try
+            {
+                this.project = new Project();
+                binder.writeBean(this.project);
+
+                if (title.getValue().trim().equals(""))
+                {
+                    Notification.show("Bitte Titel eintragen.");
+                } else
+                {
+                    if (assistant.isEmpty())
+                    {
+                        Notification.show("Bitte Assistent eintragen.");
+                    } else
+                    {
+                        if (deadline.isEmpty())
+                        {
+                            Notification.show("Bitte Deadline eintragen.");
+                        }
+                    }
+                }
+                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
+                {
+                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
+                    {
+                        if (this.project != null)
+                        {
+                            int exists = projectEntityService.exists(this.project);
+                            if (exists == 0)
+                            {
+                                projects=projectService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
+                                }
+                                else
+                                {
+                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getProjLimit();
+                                }
+                                if (projects.size()<limit)
+                                {
+                                    projectService.update(this.project);
+                                    clearForm();
+                                    refreshGrid();
+                                    Notification.show("Projekt gespeichert.");
+                                }
+                                else
+                                {
+                                    Notification.show("Ihr Limit an Projekten ist bereits erreicht.");
+                                }
+                            } else
+                            {
+                                Notification.show("Titel existiert bereits.");
+                            }
+                        }
+                    }
+                } else
+                {
+                    Notification.show("Assistenten dürfen nur Projekte auf ihren eigenen Namen buchen.");
+                }
+                UI.getCurrent().navigate(ProjekteAssistentenView.class);
+            } catch (ValidationException validationException)
+            {
+                Notification.show("Es ist leider etwas schief gegangen.");
+            }
+        });
+    }
+
+    private void cancelButtonListener()
+    {
+        //Hook up Cancel Button
+        cancel.addClickListener(e ->
+        {
+            clearForm();
+            refreshGrid();
+        });
+    }
+
+    private void configureBinder()
+    {
+        // Configure Form
+        binder = new BeanValidationBinder<>(Project.class);
+        // Bind fields. This is where you'd define e.g. validation rules
+        binder.bindInstanceFields(this);
+    }
+
+    private void reactToGridSelection()
+    {
+        // when a row is selected or deselected, populate form
+        grid.asSingleSelect().addValueChangeListener(event ->
+        {
+            if (event.getValue() != null)
+            {
+                UI.getCurrent().navigate(String.format(PROJECT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+            } else
+            {
+                clearForm();
+                UI.getCurrent().navigate(ProjekteAssistentenView.class);
+            }
+        });
+    }
+
+    private void createGrid()
+    {
+        // Configure Grid
+        grid.addColumn("title").setWidth("800px");
+        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname(), "assistant.firstname")
+                .setHeader("Assistent")
+                .setKey("assistant")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(project -> fillStudentColumn(project), "student.firstname")
+                .setHeader("Student")
+                .setKey("student")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn("deadline").setAutoWidth(true);
+        grid.addComponentColumn(projectFinished -> createFinishedIcon(projectFinished.isFinished()))
+                .setHeader("Abg.")
+                .setKey("finished")
+                .setAutoWidth(true);
+        grid.getColumnByKey("title").setHeader("Titel");
+        grid.getColumnByKey("deadline").setHeader("Deadline");
+
+        grid.setItems(query -> projectService.list(
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream());
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+    }
+
     @Override
     public void beforeEnter(BeforeEnterEvent event)
     {
@@ -314,13 +355,33 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         }
     }
 
+    private String fillStudentColumn(Project project)
+    {
+
+        String student="";
+        if(project.getStudent()!=null && !project.getStudent().equals(""))
+        {
+            student = project.getStudent().getFirstname() + " " + project.getStudent().getLastname();
+        }
+        return student;
+    }
+
     private void createAssistantBox()
     {
         assistant.setAllowCustomValue(false);
-        assistant.setPlaceholder("Assistenten auswählen");
+        assistant.setPlaceholder("Assistent auswählen");
         List<Assistant> assistants = assistantService.getAll();
         assistant.setItems(assistants);
         assistant.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
+    }
+
+    private void createStudentBox()
+    {
+        student.setAllowCustomValue(false);
+        student.setPlaceholder("Student auswählen");
+        List<Student> students = studentService.getAll();
+        student.setItems(students);
+        student.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
     }
 
     private void createEditorLayout(SplitLayout splitLayout)
@@ -334,7 +395,7 @@ public class ProjekteAssistentenView extends Div implements BeforeEnterObserver
         FormLayout formLayout = new FormLayout();
         title = new TextField("Titel");
         createAssistantBox();
-        student = new TextField("Student");
+        createStudentBox();
         deadline = new DatePicker("Deadline");
         finished = new Checkbox("Abgeschlossen");
         Component[] fields = new Component[]{title, assistant, student, deadline, finished};

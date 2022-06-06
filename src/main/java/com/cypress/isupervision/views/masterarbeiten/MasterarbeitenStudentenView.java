@@ -42,8 +42,8 @@ import java.util.List;
 public class MasterarbeitenStudentenView extends Div
 {
     private Grid<MastersThesis> grid = new Grid<>(MastersThesis.class, false);
-    private AuthenticatedUser authenticatedUser;
     private List<MastersThesis> mastersTheses;
+    ProjectEntityService projectEntityService;
     private MastersThesis mastersThesis;
     private ComboBox<String> mastersThesisBox = new ComboBox("Masterarbeit-Anmeldung");
     private Button signup = new Button("Anmelden");
@@ -56,8 +56,8 @@ public class MasterarbeitenStudentenView extends Div
     {
         addClassNames("masterarbeiten-view");
         this.mastersThesisService=mastersThesisService;
+        this.projectEntityService=projectEntityService;
         student = studentService.get(authenticatedUser.get().get().getUsername());
-
         // Create UI
         mastersTheses=mastersThesisService.searchOpenProjects();
         SplitLayout splitLayout = new SplitLayout();
@@ -67,7 +67,11 @@ public class MasterarbeitenStudentenView extends Div
         add(splitLayout);
         configureGrid();
         grid.setItems(mastersTheses);
+        signupButtonListener();
+    }
 
+    private void signupButtonListener()
+    {
         signup.addClickListener(e->{
             if(!mastersThesisBox.isEmpty())
             {
@@ -75,7 +79,7 @@ public class MasterarbeitenStudentenView extends Div
                 {
                     if(projectEntityService.get(mastersThesisBox.getValue()).getStudent()==null ||projectEntityService.get(mastersThesisBox.getValue()).getStudent().equals(""))
                     {
-                        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
+                        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student);
                         List<ProjectEntity> tempEntities = new ArrayList<>();
                         tempEntities.addAll(projectEntities);
                         for(int i=0;i<tempEntities.size();i++)
@@ -125,14 +129,16 @@ public class MasterarbeitenStudentenView extends Div
     private void configureGrid()
     {
         grid.addColumn("title").setWidth("800px");
-        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
-        grid.addColumn("student").setAutoWidth(true);
+        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname(), "assistant.firstname")
+                .setHeader("Assistent")
+                .setKey("assistant")
+                .setAutoWidth(true)
+                .setSortable(true);
         grid.addColumn("deadline").setAutoWidth(true);
         grid.addColumn("examDate").setAutoWidth(true);
 
         grid.getColumnByKey("title").setHeader("Titel");
         grid.getColumnByKey("assistant").setHeader("Assistent");
-        grid.getColumnByKey("student").setHeader("Student");
         grid.getColumnByKey("deadline").setHeader("Deadline");
         grid.getColumnByKey("examDate").setHeader("Prüfungsdatum");
     }
@@ -191,7 +197,7 @@ public class MasterarbeitenStudentenView extends Div
                 mastersThesis=m;
             }
         }
-        mastersThesis.setStudent(student.getFirstname()+ " " + student.getLastname());
+        mastersThesis.setStudent(student);
         mastersThesisService.update(mastersThesis);
         Notification.show("Du wurdest für die Masterarbeit angemeldet.");
         warning.close();

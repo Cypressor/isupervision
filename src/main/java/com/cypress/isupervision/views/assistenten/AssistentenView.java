@@ -71,72 +71,68 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
     private BeanValidationBinder<Assistant> binder;
     private Assistant assistant;
     private final AssistantService assistantService;
+    private UserService userService;
     private Dialog warning = new Dialog();
 
     @Autowired
     public AssistentenView(AssistantService assistantService, UserService userService) {
         this.assistantService = assistantService;
+        this.userService = userService;
         addClassNames("assistenten-view");
-
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
         createDialog();
         add(splitLayout);
+        createGrid();
+        //Hook up buttons
+        reactToGridSelection();
+        configureBinder();
+        cancelButtonListener();
+        saveButtonListener();
+        deleteButtonListener();
+        editButtonListener();
+    }
 
-        // Configure Grid
-        grid.addColumn("username").setAutoWidth(true);
-        grid.addColumn("firstname").setAutoWidth(true);
-        grid.addColumn("lastname").setAutoWidth(true);
-        grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("password").setAutoWidth(true);
-        grid.addColumn("projLimit").setAutoWidth(true);
-        grid.addColumn("baLimit").setAutoWidth(true);
-        grid.addColumn("maLimit").setAutoWidth(true);
-
-        grid.getColumnByKey("username").setHeader("Benutzername");
-        grid.getColumnByKey("firstname").setHeader("Vorname");
-        grid.getColumnByKey("lastname").setHeader("Nachname");
-        grid.getColumnByKey("email").setHeader("Email");
-        grid.getColumnByKey("password").setHeader("Passwort");
-        grid.getColumnByKey("projLimit").setHeader("Pa-Limit");
-        grid.getColumnByKey("baLimit").setHeader("Ba-Limit");
-        grid.getColumnByKey("maLimit").setHeader("Ma-Limit");
-
-        grid.setItems(query -> assistantService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-                .stream());
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(ASSISTENT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
-            } else {
-                clearForm();
+    private void editButtonListener()
+    {
+        //Hook up Edit Button
+        edit.addClickListener(e-> {
+            try
+            {
+                if (this.assistant != null)
+                {
+                    binder.writeBean(this.assistant);
+                    if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("")  || projLimit.getValue().trim().equals("") || baLimit.getValue().trim().equals("")  || maLimit.getValue().trim().equals(""))
+                    {
+                        Notification.show("Bitte alle Felder ausfüllen.");
+                    }
+                    else
+                    {
+                        assistantService.update(this.assistant);
+                        clearForm();
+                        refreshGrid();
+                        Notification.show("Assistent wurde bearbeitet.");
+                    }
+                }
                 UI.getCurrent().navigate(AssistentenView.class);
-            }
+            } catch (ValidationException validationException) {
+                Notification.show("Es ist leider etwas schief gegangen.");
+            }});
+    }
+
+    private void deleteButtonListener()
+    {
+        //Hook up Delete Button
+        delete.addClickListener(e -> {
+            warning.open();
         });
 
-        // Configure Form
-        binder = new BeanValidationBinder<>(Assistant.class);
+    }
 
-        // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField(projLimit).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
-                .bind("projLimit");
-        binder.forField(baLimit).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
-                .bind("baLimit");
-        binder.forField(maLimit).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
-                .bind("maLimit");
-        binder.bindInstanceFields(this);
-
-        //Hook up Cancel Button
-        cancel.addClickListener(e -> {
-            clearForm();
-            refreshGrid();
-        });
-
+    private void saveButtonListener()
+    {
         //Hook up Save Button
         save.addClickListener(e -> {
             try {
@@ -178,35 +174,70 @@ public class AssistentenView extends Div implements BeforeEnterObserver {
                 Notification.show("Es ist leider etwas schief gegangen.");
             }
         });
+    }
 
-        //Hook up Delete Button
-        delete.addClickListener(e -> {
-            warning.open();
+    private void cancelButtonListener()
+    {
+        //Hook up Cancel Button
+        cancel.addClickListener(e -> {
+            clearForm();
+            refreshGrid();
         });
+    }
 
-        //Hook up Edit Button
-        edit.addClickListener(e-> {
-            try
-            {
-                if (this.assistant != null)
-                {
-                    binder.writeBean(this.assistant);
-                    if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals("")  || projLimit.getValue().trim().equals("") || baLimit.getValue().trim().equals("")  || maLimit.getValue().trim().equals(""))
-                    {
-                        Notification.show("Bitte alle Felder ausfüllen.");
-                    }
-                    else
-                    {
-                        assistantService.update(this.assistant);
-                        clearForm();
-                        refreshGrid();
-                        Notification.show("Assistent wurde bearbeitet.");
-                    }
-                }
+    private void configureBinder()
+    {
+        // Configure Form
+        binder = new BeanValidationBinder<>(Assistant.class);
+
+        // Bind fields. This is where you'd define e.g. validation rules
+        binder.forField(projLimit).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
+                .bind("projLimit");
+        binder.forField(baLimit).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
+                .bind("baLimit");
+        binder.forField(maLimit).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
+                .bind("maLimit");
+        binder.bindInstanceFields(this);
+    }
+
+    private void reactToGridSelection()
+    {
+        // when a row is selected or deselected, populate form
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                UI.getCurrent().navigate(String.format(ASSISTENT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+            } else {
+                clearForm();
                 UI.getCurrent().navigate(AssistentenView.class);
-            } catch (ValidationException validationException) {
-                Notification.show("Es ist leider etwas schief gegangen.");
-            }});
+            }
+        });
+    }
+
+    private void createGrid()
+    {
+        // Configure Grid
+        grid.addColumn("username").setAutoWidth(true);
+        grid.addColumn("firstname").setAutoWidth(true);
+        grid.addColumn("lastname").setAutoWidth(true);
+        grid.addColumn("email").setAutoWidth(true);
+        grid.addColumn("password").setAutoWidth(true);
+        grid.addColumn("projLimit").setAutoWidth(true);
+        grid.addColumn("baLimit").setAutoWidth(true);
+        grid.addColumn("maLimit").setAutoWidth(true);
+
+        grid.getColumnByKey("username").setHeader("Benutzername");
+        grid.getColumnByKey("firstname").setHeader("Vorname");
+        grid.getColumnByKey("lastname").setHeader("Nachname");
+        grid.getColumnByKey("email").setHeader("Email");
+        grid.getColumnByKey("password").setHeader("Passwort");
+        grid.getColumnByKey("projLimit").setHeader("Pa-Limit");
+        grid.getColumnByKey("baLimit").setHeader("Ba-Limit");
+        grid.getColumnByKey("maLimit").setHeader("Ma-Limit");
+
+        grid.setItems(query -> assistantService.list(
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream());
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
     }
 
     @Override

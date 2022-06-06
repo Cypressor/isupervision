@@ -41,22 +41,22 @@ import java.util.List;
 public class ProjekteStudentenView extends Div
 {
     private Grid<Project> grid = new Grid<>(Project.class, false);
-    private AuthenticatedUser authenticatedUser;
     private List<Project> projects;
     private Project project;
     private ComboBox<String> projectBox = new ComboBox("Projekt-Anmeldung");
     private Button signup = new Button("Anmelden");
     private Dialog warning = new Dialog();
     private Student student;
-    ProjectService projectService;
+    private final ProjectService projectService;
+    private final ProjectEntityService projectEntityService;
 
     @Autowired
     ProjekteStudentenView(AuthenticatedUser authenticatedUser, ProjectService projectService, ProjectEntityService projectEntityService, StudentService studentService)
     {
         addClassNames("projekte-view");
         this.projectService=projectService;
+        this.projectEntityService=projectEntityService;
         student = studentService.get(authenticatedUser.get().get().getUsername());
-
         // Create UI
         projects=projectService.searchOpenProjects();
         SplitLayout splitLayout = new SplitLayout();
@@ -66,7 +66,11 @@ public class ProjekteStudentenView extends Div
         add(splitLayout);
         configureGrid();
         grid.setItems(projects);
+        signupButtonListener();
+    }
 
+    private void signupButtonListener()
+    {
         signup.addClickListener(e->{
             if(!projectBox.isEmpty())
             {
@@ -75,7 +79,7 @@ public class ProjekteStudentenView extends Div
 
                     if(projectEntityService.get(projectBox.getValue()).getStudent()==null ||projectEntityService.get(projectBox.getValue()).getStudent().equals(""))
                     {
-                        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
+                        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student);
                         for(int i=0;i<projectEntities.size();i++)
                         {
                             if(projectEntities.get(i).isFinished())
@@ -109,13 +113,13 @@ public class ProjekteStudentenView extends Div
     private void configureGrid()
     {
         grid.addColumn("title").setWidth("800px");
-        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
-        grid.addColumn("student").setAutoWidth(true);
+        grid.addColumn(project -> project.getAssistant().getFirstname()+" "+project.getAssistant().getLastname(), "assistant.firstname")
+                .setHeader("Assistent")
+                .setKey("assistant")
+                .setAutoWidth(true)
+                .setSortable(true);
         grid.addColumn("deadline").setAutoWidth(true);
-
         grid.getColumnByKey("title").setHeader("Titel");
-        grid.getColumnByKey("assistant").setHeader("Assistent");
-        grid.getColumnByKey("student").setHeader("Student");
         grid.getColumnByKey("deadline").setHeader("Deadline");
     }
 
@@ -179,7 +183,7 @@ public class ProjekteStudentenView extends Div
                 project=p;
             }
         }
-        project.setStudent(student.getFirstname()+ " " + student.getLastname());
+        project.setStudent(student);
         projectService.update(project);
         Notification.show("Du wurdest für das Projekt angemeldet.");
         warning.close();

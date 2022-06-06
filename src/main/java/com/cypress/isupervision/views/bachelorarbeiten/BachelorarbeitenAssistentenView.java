@@ -10,11 +10,10 @@ package com.cypress.isupervision.views.bachelorarbeiten;
 
 import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.entity.project.BachelorsThesis;
+import com.cypress.isupervision.data.entity.project.Project;
 import com.cypress.isupervision.data.entity.user.Assistant;
-import com.cypress.isupervision.data.service.AdministratorService;
-import com.cypress.isupervision.data.service.AssistantService;
-import com.cypress.isupervision.data.service.BachelorsThesisService;
-import com.cypress.isupervision.data.service.ProjectEntityService;
+import com.cypress.isupervision.data.entity.user.Student;
+import com.cypress.isupervision.data.service.*;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -60,12 +59,15 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
     private final String BACHELORSTHESIS_ID = "bachelorsthesisID";
     private final String BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE = "bachelorstheses/assistant/%s/edit";
     private final BachelorsThesisService bachelorsThesisService;
-    private AssistantService assistantService;
-    private AuthenticatedUser authenticatedUser;
+    private final AssistantService assistantService;
+    private final StudentService studentService;
+    private final AuthenticatedUser authenticatedUser;
+    private final AdministratorService administratorService;
+    private final ProjectEntityService projectEntityService;
     private Grid<BachelorsThesis> grid = new Grid<>(BachelorsThesis.class, false);
     private TextField title;
     private ComboBox<Assistant> assistant = new ComboBox<>("Assistent");
-    private TextField student;
+    private ComboBox<Student> student = new ComboBox<>("Student (optional)");
     private DatePicker deadline;
     private Checkbox finished;
     private Button cancel = new Button("Abbrechen");
@@ -78,147 +80,34 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
     private List<BachelorsThesis> bachelorsTheses;
     private int limit;
 
-    public BachelorarbeitenAssistentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService, AssistantService assistantService, AdministratorService administratorService)
+    public BachelorarbeitenAssistentenView(AuthenticatedUser authenticatedUser, BachelorsThesisService bachelorsThesisService, ProjectEntityService projectEntityService, StudentService studentService, AssistantService assistantService, AdministratorService administratorService)
     {
         this.bachelorsThesisService = bachelorsThesisService;
         this.authenticatedUser = authenticatedUser;
         this.assistantService = assistantService;
+        this.studentService = studentService;
+        this.administratorService =administratorService;
+        this. projectEntityService = projectEntityService;
         addClassNames("bachelorarbeiten-view");
-
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
         createDialog();
         add(splitLayout);
-
-        // Configure Grid
-        grid.addColumn("title").setWidth("800px");
-        grid.addColumn(bachelorsThesis -> bachelorsThesis.getAssistant().getFirstname()+" "+bachelorsThesis.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
-        grid.addColumn("student").setAutoWidth(true);
-        grid.addColumn("deadline").setAutoWidth(true);
-        grid.addComponentColumn(bachelorsThesisFinished -> createFinishedIcon(bachelorsThesisFinished.isFinished())).setHeader("Abg.");
-
-        grid.getColumnByKey("title").setHeader("Titel");
-        grid.getColumnByKey("assistant").setHeader("Assistent");
-        grid.getColumnByKey("student").setHeader("Student");
-        grid.getColumnByKey("deadline").setHeader("Deadline");
-
-        grid.setItems(query -> bachelorsThesisService.list(
-                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-                .stream());
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event ->
-        {
-            if (event.getValue() != null)
-            {
-                UI.getCurrent().navigate(String.format(BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
-            } else
-            {
-                clearForm();
-                UI.getCurrent().navigate(BachelorarbeitenAssistentenView.class);
-            }
-        });
+        createGrid();
+        //Hook up buttons
+        reactToGridSelection();
         fillAssistantField();
+        configureBinder();
+        cancelButtonListener();
+        saveButtonListener();
+        deleteButtonListener();
+        editButtonListener();
+    }
 
-        // Configure Form
-        binder = new BeanValidationBinder<>(BachelorsThesis.class);
-
-        // Bind fields. This is where you'd define e.g. validation rules
-        binder.bindInstanceFields(this);
-
-        //Hook up Cancel Button
-        cancel.addClickListener(e ->
-        {
-            clearForm();
-            refreshGrid();
-        });
-
-        //Hook up Save Button
-        save.addClickListener(e ->
-        {
-            try
-            {
-                this.bachelorsThesis = new BachelorsThesis();
-                binder.writeBean(this.bachelorsThesis);
-                if (title.getValue().trim().equals(""))
-                {
-                    Notification.show("Bitte Titel eintragen.");
-                } else
-                {
-                    if (assistant.isEmpty())
-                    {
-                        Notification.show("Bitte Assistent eintragen.");
-                    } else
-                    {
-                        if (deadline.isEmpty())
-                        {
-                            Notification.show("Bitte Deadline eintragen.");
-                        }
-                    }
-                }
-                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
-                {
-                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
-                    {
-                        if (this.bachelorsThesis != null)
-                        {
-                            int exists = projectEntityService.exists(this.bachelorsThesis);
-                            if (exists == 0)
-                            {
-                                bachelorsTheses=bachelorsThesisService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
-                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
-                                {
-
-                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
-                                }
-                                else
-                                {
-                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
-                                }
-                                if (bachelorsTheses.size()<limit)
-                                {
-                                    bachelorsThesisService.update(this.bachelorsThesis);
-                                    clearForm();
-                                    refreshGrid();
-                                    Notification.show("Bachelorarbeit gespeichert.");
-                                }
-                                else
-                                {
-                                    Notification.show("Ihr Limit an Bachelorarbeiten ist bereits erreicht.");
-                                }
-                            } else
-                            {
-                                Notification.show("Titel existiert bereits.");
-                            }
-                        }
-                    }
-                } else
-                {
-                    Notification.show("Assistenten dürfen nur Bachelorarbeiten auf ihren eigenen Namen buchen.");
-                }
-                UI.getCurrent().navigate(BachelorarbeitenAssistentenView.class);
-            } catch (ValidationException validationException)
-            {
-                Notification.show("Es ist leider etwas schief gegangen.");
-            }
-        });
-
-        //Hook up Delete Button
-        delete.addClickListener(e ->
-        {
-            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || authenticatedUser.get().get().getUsername().equals(this.bachelorsThesis.getAssistant().getUsername()))
-            {
-                warning.open();
-            }
-            else
-            {
-                Notification.show("Assistenten dürfen nur ihre eigenen Bachelorarbeiten löschen.");
-            }
-        });
-
+    private void editButtonListener()
+    {
         //Hook up Edit Button
         edit.addClickListener(e ->
         {
@@ -290,7 +179,158 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
                 Notification.show("Es ist leider etwas schief gegangen.");
             }
         });
+    }
 
+    private void deleteButtonListener()
+    {
+        //Hook up Delete Button
+        delete.addClickListener(e ->
+        {
+            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || authenticatedUser.get().get().getUsername().equals(this.bachelorsThesis.getAssistant().getUsername()))
+            {
+                warning.open();
+            }
+            else
+            {
+                Notification.show("Assistenten dürfen nur ihre eigenen Bachelorarbeiten löschen.");
+            }
+        });
+    }
+
+    private void saveButtonListener()
+    {
+        //Hook up Save Button
+        save.addClickListener(e ->
+        {
+            try
+            {
+                this.bachelorsThesis = new BachelorsThesis();
+                binder.writeBean(this.bachelorsThesis);
+                if (title.getValue().trim().equals(""))
+                {
+                    Notification.show("Bitte Titel eintragen.");
+                } else
+                {
+                    if (assistant.isEmpty())
+                    {
+                        Notification.show("Bitte Assistent eintragen.");
+                    } else
+                    {
+                        if (deadline.isEmpty())
+                        {
+                            Notification.show("Bitte Deadline eintragen.");
+                        }
+                    }
+                }
+                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
+                {
+                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
+                    {
+                        if (this.bachelorsThesis != null)
+                        {
+                            int exists = projectEntityService.exists(this.bachelorsThesis);
+                            if (exists == 0)
+                            {
+                                bachelorsTheses=bachelorsThesisService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
+                                }
+                                else
+                                {
+                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getBaLimit();
+                                }
+                                if (bachelorsTheses.size()<limit)
+                                {
+                                    bachelorsThesisService.update(this.bachelorsThesis);
+                                    clearForm();
+                                    refreshGrid();
+                                    Notification.show("Bachelorarbeit gespeichert.");
+                                }
+                                else
+                                {
+                                    Notification.show("Ihr Limit an Bachelorarbeiten ist bereits erreicht.");
+                                }
+                            } else
+                            {
+                                Notification.show("Titel existiert bereits.");
+                            }
+                        }
+                    }
+                } else
+                {
+                    Notification.show("Assistenten dürfen nur Bachelorarbeiten auf ihren eigenen Namen buchen.");
+                }
+                UI.getCurrent().navigate(BachelorarbeitenAssistentenView.class);
+            } catch (ValidationException validationException)
+            {
+                Notification.show("Es ist leider etwas schief gegangen.");
+            }
+        });
+    }
+
+    private void cancelButtonListener()
+    {
+        //Hook up Cancel Button
+        cancel.addClickListener(e ->
+        {
+            clearForm();
+            refreshGrid();
+        });
+    }
+
+    private void configureBinder()
+    {
+        // Configure Form
+        binder = new BeanValidationBinder<>(BachelorsThesis.class);
+        // Bind fields. This is where you'd define e.g. validation rules
+        binder.bindInstanceFields(this);
+    }
+
+    private void reactToGridSelection()
+    {
+        // when a row is selected or deselected, populate form
+        grid.asSingleSelect().addValueChangeListener(event ->
+        {
+            if (event.getValue() != null)
+            {
+                UI.getCurrent().navigate(String.format(BACHELORSTHESIS_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+            } else
+            {
+                clearForm();
+                UI.getCurrent().navigate(BachelorarbeitenAssistentenView.class);
+            }
+        });
+    }
+
+    private void createGrid()
+    {
+        // Configure Grid
+        grid.addColumn("title").setWidth("800px");
+        grid.addColumn(bachelorsThesis -> bachelorsThesis.getAssistant().getFirstname()+" "+bachelorsThesis.getAssistant().getLastname(), "assistant.firstname")
+                .setHeader("Assistent")
+                .setKey("assistant")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(bachelorsThesis -> fillStudentColumn(bachelorsThesis), "student.firstname")
+                .setHeader("Student")
+                .setKey("student")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn("deadline").setAutoWidth(true);
+        grid.addComponentColumn(bachelorsThesisFinished -> createFinishedIcon(bachelorsThesisFinished.isFinished()))
+                .setHeader("Abg.")
+                .setKey("finished")
+                .setAutoWidth(true);
+
+        grid.getColumnByKey("title").setHeader("Titel");
+        grid.getColumnByKey("deadline").setHeader("Deadline");
+
+        grid.setItems(query -> bachelorsThesisService.list(
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream());
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
     }
 
     @Override
@@ -315,6 +355,17 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         }
     }
 
+    private String fillStudentColumn(BachelorsThesis bachelorsThesis)
+    {
+
+        String student="";
+        if(bachelorsThesis.getStudent()!=null && !bachelorsThesis.getStudent().equals(""))
+        {
+            student = bachelorsThesis.getStudent().getFirstname() + " " + bachelorsThesis.getStudent().getLastname();
+        }
+        return student;
+    }
+
     private void createAssistantBox()
     {
         assistant.setAllowCustomValue(false);
@@ -322,6 +373,15 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         List<Assistant> assistants = assistantService.getAll();
         assistant.setItems(assistants);
         assistant.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
+    }
+
+    private void createStudentBox()
+    {
+        student.setAllowCustomValue(false);
+        student.setPlaceholder("Student auswählen");
+        List<Student> students = studentService.getAll();
+        student.setItems(students);
+        student.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
     }
 
     private void createEditorLayout(SplitLayout splitLayout)
@@ -335,7 +395,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
         FormLayout formLayout = new FormLayout();
         title = new TextField("Titel");
         createAssistantBox();
-        student = new TextField("Student");
+        createStudentBox();
         deadline = new DatePicker("Deadline");
         finished = new Checkbox("Abgeschlossen");
         Component[] fields = new Component[]{title, assistant, student, deadline, finished};
@@ -418,7 +478,7 @@ public class BachelorarbeitenAssistentenView extends Div implements BeforeEnterO
 
     private void fillAssistantField()
     {
-        if (!authenticatedUser.get().get().getRoles().toString().contains("ADMIN"))
+        if (!authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
         {
             assistant.setValue(assistantService.get(authenticatedUser.get().get().getUsername()));
         }

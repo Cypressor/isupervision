@@ -107,7 +107,7 @@ public class DataGenerator
             if(attendants.size()>0)
             {
                 randomNumber = rng.nextInt(attendants.size());
-                mastersThesis.setStudent(attendants.get(randomNumber).getFirstname()+" " + attendants.get(randomNumber).getLastname());
+                mastersThesis.setStudent(attendants.get(randomNumber));
                 if((randomNumber%3)>0)
                 {
                     mastersThesis.setFinished(true);
@@ -141,7 +141,7 @@ public class DataGenerator
             if(attendants.size()>0)
             {
                 randomNumber = rng.nextInt(attendants.size());
-                bachelorsThesis.setStudent(attendants.get(randomNumber).getFirstname()+" " + attendants.get(randomNumber).getLastname());
+                bachelorsThesis.setStudent(attendants.get(randomNumber));
                 if((randomNumber%3)>0)
                 {
                     bachelorsThesis.setFinished(true);
@@ -174,7 +174,7 @@ public class DataGenerator
             if(!attendants.contains(students.get(randomNumber)))
             {
                 attendants.add(students.get(randomNumber));
-                project.setStudent(students.get(randomNumber).getFirstname()+" "+students.get(randomNumber).getLastname());
+                project.setStudent(students.get(randomNumber));
                 if((randomNumber%4)>0)
                 {
                     finishers.add(students.get(randomNumber));
@@ -248,11 +248,13 @@ public class DataGenerator
         admin.setFirstname("ad");
         admin.setLastname("min");
         admin.setUsername("admin");
-        assistant.setProjLimit(20);
-        assistant.setBaLimit(10);
-        assistant.setMaLimit(5);
+        admin.setEmail("admin@edu.at");
+        admin.setProjLimit(100);
+        admin.setBaLimit(100);
+        admin.setMaLimit(100);
         admin.setPassword("verysecureadminpw");
         admin.setHashedPassword(passwordEncoder.encode(admin.getPassword()));
+        admin.setPassword("nicetrybro");
         admin.setProfilePictureUrl(
                 "https://breakingmuscle.com/wp-content/uploads/2015/01/biceplevisquare.png");
         administratorRepository.save(admin);

@@ -2,7 +2,7 @@
 ## Introduction:
 This application has been created as a part of the exercise course "Objektorientierte Programmierung", wich contributes to the study course "Business Software Development" at FH Campus02.
 This is an experimental version of a business software application and should be treated as such. Be aware that this version of the software is not meant to be used in a real world scenario.
-When using this software, be aware that data like passwords are intentionally not handled securely within the application to simplify the process of testing it.
+When using this software, be aware that data like passwords are intentionally not handled securely within the application to simplify the process of testing.
 
 ### Framework/Dependencies:
 

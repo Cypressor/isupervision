@@ -64,68 +64,81 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private Button save = new Button("Speichern");
     private Button delete = new Button("Löschen");
     private Button edit = new Button("Ändern");
+    private Dialog warning = new Dialog();
     private BeanValidationBinder<Student> binder;
     private Student student;
     private final StudentService studentService;
-    private Dialog warning = new Dialog();
-    private ProjectEntityService projectEntityService;
-    private AuthenticatedUser authenticatedUser;
+
+    private final ProjectEntityService projectEntityService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public StudentenView(StudentService studentService, UserService userService, PasswordEncoder passwordEncoder, ProjectEntityService projectEntityService, AuthenticatedUser authenticatedUser) {
 
         this.projectEntityService =projectEntityService;
         this.studentService = studentService;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
         addClassNames("studenten-view");
-
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
         createDialog();
         add(splitLayout);
+        createGrid();
+        //Hook up buttons
+        reactToGridSelection();
+        configureBinder();
+        cancelButtonListener();
+        saveButtonListener();
+        deleteButtonListener();
+        editButtonListener();
+    }
 
-        // Configure Grid
-        grid.addColumn("username").setAutoWidth(true);
-        grid.addColumn("firstname").setAutoWidth(true);
-        grid.addColumn("lastname").setAutoWidth(true);
-        grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("password").setAutoWidth(true);
-        grid.addColumn(student -> getStudentMaxAchievement(student)).setHeader("Abschluss");
-
-        grid.getColumnByKey("username").setHeader("Benutzername");
-        grid.getColumnByKey("firstname").setHeader("Vorname");
-        grid.getColumnByKey("lastname").setHeader("Nachname");
-        grid.getColumnByKey("email").setHeader("Email");
-        grid.getColumnByKey("password").setHeader("Passwort");
-
-        grid.setItems(query -> studentService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-                .stream());
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(STUDENT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
-            } else {
-                clearForm();
+    private void editButtonListener()
+    {
+        //Hook up Edit Button
+        edit.addClickListener(e-> {
+            try
+            {
+                if (this.student != null)
+                {
+                    binder.writeBean(this.student);
+                    if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals(""))
+                    {
+                        Notification.show("Bitte alle Felder ausfüllen.");
+                    }
+                    else
+                    {
+                        this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
+                        studentService.update(this.student);
+                        clearForm();
+                        refreshGrid();
+                        Notification.show("Student wurde bearbeitet.");
+                    }
+                }
+                else
+                {
+                    Notification.show("Kein Student ausgewählt.");
+                }
                 UI.getCurrent().navigate(StudentenView.class);
-            }
+            } catch (ValidationException validationException) {
+                Notification.show("Es ist leider etwas schief gegangen.");
+            }});
+    }
+
+    private void deleteButtonListener()
+    {
+        //Hook up Delete Button
+        delete.addClickListener(e -> {
+            warning.open();
         });
+    }
 
-        // Configure Form
-        binder = new BeanValidationBinder<>(Student.class);
-
-        // Bind fields. This is where you'd define e.g. validation rules
-        binder.bindInstanceFields(this);
-
-        //Hook up Cancel Button
-        cancel.addClickListener(e -> {
-            clearForm();
-            refreshGrid();
-        });
-
+    private void saveButtonListener()
+    {
         //Hook up Save Button
         save.addClickListener(e -> {
             try {
@@ -176,39 +189,37 @@ public class StudentenView extends Div implements BeforeEnterObserver {
             }
         });
 
-        //Hook up Delete Button
-        delete.addClickListener(e -> {
-            warning.open();
-        });
+    }
 
-        //Hook up Edit Button
-        edit.addClickListener(e-> {
-            try
-            {
-                if (this.student != null)
-                {
-                    binder.writeBean(this.student);
-                    if(username.getValue().trim().equals("") || firstname.getValue().trim().equals("") || lastname.getValue().trim().equals("") || email.getValue().trim().equals("") || password.getValue().trim().equals(""))
-                    {
-                        Notification.show("Bitte alle Felder ausfüllen.");
-                    }
-                    else
-                    {
-                            this.student.setHashedPassword(passwordEncoder.encode(this.student.getPassword()));
-                            studentService.update(this.student);
-                            clearForm();
-                            refreshGrid();
-                            Notification.show("Student wurde bearbeitet.");
-                    }
-               }
-                else
-                {
-                    Notification.show("Kein Student ausgewählt.");
-                }
-            UI.getCurrent().navigate(StudentenView.class);
-        } catch (ValidationException validationException) {
-            Notification.show("Es ist leider etwas schief gegangen.");
-        }});
+    private void cancelButtonListener()
+    {
+        //Hook up Cancel Button
+        cancel.addClickListener(e -> {
+            clearForm();
+            refreshGrid();
+        });
+    }
+
+    private void configureBinder()
+    {
+        // Configure Form
+        binder = new BeanValidationBinder<>(Student.class);
+
+        // Bind fields. This is where you'd define e.g. validation rules
+        binder.bindInstanceFields(this);
+    }
+
+    private void reactToGridSelection()
+    {
+        // when a row is selected or deselected, populate form
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                UI.getCurrent().navigate(String.format(STUDENT_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+            } else {
+                clearForm();
+                UI.getCurrent().navigate(StudentenView.class);
+            }
+        });
     }
 
     @Override
@@ -227,6 +238,26 @@ public class StudentenView extends Div implements BeforeEnterObserver {
                 event.forwardTo(StudentenView.class);
             }
         }
+    }
+    private void createGrid()
+    {
+        grid.addColumn("username").setAutoWidth(true);
+        grid.addColumn("firstname").setAutoWidth(true);
+        grid.addColumn("lastname").setAutoWidth(true);
+        grid.addColumn("email").setAutoWidth(true);
+        grid.addColumn("password").setAutoWidth(true);
+        grid.addColumn(student -> getStudentMaxAchievement(student)).setHeader("Abschluss");
+
+        grid.getColumnByKey("username").setHeader("Benutzername");
+        grid.getColumnByKey("firstname").setHeader("Vorname");
+        grid.getColumnByKey("lastname").setHeader("Nachname");
+        grid.getColumnByKey("email").setHeader("Email");
+        grid.getColumnByKey("password").setHeader("Passwort");
+
+        grid.setItems(query -> studentService.list(
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream());
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
     }
 
     private void createEditorLayout(SplitLayout splitLayout) {
@@ -317,7 +348,7 @@ public class StudentenView extends Div implements BeforeEnterObserver {
     private String getStudentMaxAchievement(Student student)
     {
         String returnString="Kein";
-        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student.getFirstname() + " " + student.getLastname());
+        List<ProjectEntity> projectEntities = projectEntityService.searchForStudent(student);
         for(ProjectEntity projectEntity : projectEntities)
         {
             if(!returnString.equals(ProjectType.PROJECT.toString()) && !returnString.equals(ProjectType.BACHELORSTHESIS.toString()) && !(returnString.equals(ProjectType.MASTERSTHESIS)) && (projectEntity.getProjectType() == ProjectType.PROJECT && projectEntity.isFinished()==true ))

@@ -9,6 +9,7 @@
 package com.cypress.isupervision.data.service;
 
 import com.cypress.isupervision.data.entity.project.ProjectEntity;
+import com.cypress.isupervision.data.entity.user.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +38,6 @@ public class ProjectEntityService
 
     public ProjectEntity update(ProjectEntity entity) {
         entity.setTitle(entity.getTitle().trim());
-        entity.setStudent(entity.getStudent().trim());
         return repository.save(entity);}
 
     public void delete(UUID id) {
@@ -50,7 +50,7 @@ public class ProjectEntityService
 
     public List<ProjectEntity> searchForAssistant(String assistantName) {return repository.searchForAssistant(assistantName);}
 
-    public List<ProjectEntity> searchForStudent(String studentName) {return repository.searchForStudent(studentName);}
+    public List<ProjectEntity> searchForStudent(Student student) {return repository.searchForStudent(student);}
 
     public int count() {
         return (int) repository.count();

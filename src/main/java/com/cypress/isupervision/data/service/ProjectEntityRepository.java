@@ -9,6 +9,7 @@
 package com.cypress.isupervision.data.service;
 
 import com.cypress.isupervision.data.entity.project.ProjectEntity;
+import com.cypress.isupervision.data.entity.user.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,5 +25,5 @@ public interface ProjectEntityRepository extends JpaRepository<ProjectEntity, UU
 
     @Query("select projectEntity from ProjectEntity projectEntity " +
             "where (projectEntity.student) = :searchTerm")
-    List<ProjectEntity> searchForStudent(@Param("searchTerm") String searchTerm);
+    List<ProjectEntity> searchForStudent(@Param("searchTerm") Student searchTerm);
 }

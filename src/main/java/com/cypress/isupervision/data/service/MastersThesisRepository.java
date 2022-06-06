@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.cypress.isupervision.data.entity.user.Assistant;
+import com.cypress.isupervision.data.entity.user.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,7 +27,7 @@ public interface MastersThesisRepository extends JpaRepository<MastersThesis, UU
 
     @Query("select mastersThesis from MastersThesis mastersThesis " +
             "where (mastersThesis.student) = :searchTerm")
-    List<MastersThesis> searchForStudent(@Param("searchTerm") String searchTerm);
+    List<MastersThesis> searchForStudent(@Param("searchTerm") Student searchTerm);
 
     @Query("select mastersThesis from MastersThesis mastersThesis " +
             "where ((mastersThesis.student) is null or (mastersThesis.student) = '') and (mastersThesis.isFinished) = false")

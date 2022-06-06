@@ -11,6 +11,7 @@ package com.cypress.isupervision.data.entity.project;
 import com.cypress.isupervision.data.ProjectType;
 import com.cypress.isupervision.data.entity.AbstractEntity;
 import com.cypress.isupervision.data.entity.user.Assistant;
+import com.cypress.isupervision.data.entity.user.Student;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -24,7 +25,9 @@ public abstract class ProjectEntity extends AbstractEntity
     @ManyToOne
     @JoinColumn(name = "assistant_id")
     private Assistant assistant;
-    private String student;
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
     private LocalDate deadline;
     private boolean isFinished;
     private ProjectType projectType = ProjectType.PROJECT;
@@ -60,10 +63,10 @@ public abstract class ProjectEntity extends AbstractEntity
     public void setAssistant(Assistant assistant) {
         this.assistant = assistant;
     }
-    public String getStudent() {
+    public Student getStudent() {
         return student;
     }
-    public void setStudent(String student) {
+    public void setStudent(Student student) {
         this.student = student;
     }
     public LocalDate getDeadline() {

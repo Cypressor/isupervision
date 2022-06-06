@@ -11,10 +11,8 @@ package com.cypress.isupervision.views.masterarbeiten;
 import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.entity.project.MastersThesis;
 import com.cypress.isupervision.data.entity.user.Assistant;
-import com.cypress.isupervision.data.service.AdministratorService;
-import com.cypress.isupervision.data.service.AssistantService;
-import com.cypress.isupervision.data.service.MastersThesisService;
-import com.cypress.isupervision.data.service.ProjectEntityService;
+import com.cypress.isupervision.data.entity.user.Student;
+import com.cypress.isupervision.data.service.*;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -61,12 +59,15 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
     private final String MASTERSTHESIS_ID = "mastersthesisID";
     private final String MASTERSTHESIS_EDIT_ROUTE_TEMPLATE = "masterstheses/assistant/%s/edit";
     private final MastersThesisService mastersThesisService;
-    private AssistantService assistantService;
-    private AuthenticatedUser authenticatedUser;
+    private final AssistantService assistantService;
+    private final StudentService studentService;
+    private final AuthenticatedUser authenticatedUser;
+    private final ProjectEntityService projectEntityService;
+    private final AdministratorService administratorService;
     private Grid<MastersThesis> grid = new Grid<>(MastersThesis.class, false);
     private TextField title;
     private ComboBox<Assistant> assistant = new ComboBox<>("Assistent");
-    private TextField student;
+    private ComboBox<Student> student = new ComboBox<>("Student (optional)");
     private DatePicker deadline;
     private DatePicker examDate;
     private Checkbox finished;
@@ -80,11 +81,14 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
     private List<MastersThesis> mastersTheses;
     private int limit;
 
-    public MasterarbeitenAssistentenView(AuthenticatedUser authenticatedUser, MastersThesisService mastersThesisService, ProjectEntityService projectEntityService, AssistantService assistantService, AdministratorService administratorService)
+    public MasterarbeitenAssistentenView(AuthenticatedUser authenticatedUser, MastersThesisService mastersThesisService, ProjectEntityService projectEntityService, StudentService studentService, AssistantService assistantService, AdministratorService administratorService)
     {
         this.authenticatedUser = authenticatedUser;
         this.mastersThesisService = mastersThesisService;
         this.assistantService = assistantService;
+        this.studentService = studentService;
+        this.projectEntityService = projectEntityService;
+        this.administratorService = administratorService;
         addClassNames("masterarbeiten-view");
 
         // Create UI
@@ -93,136 +97,19 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
         createEditorLayout(splitLayout);
         createDialog();
         add(splitLayout);
-
-        // Configure Grid
-        grid.addColumn("title").setWidth("750px");
-        grid.addColumn(bachelorsThesis -> bachelorsThesis.getAssistant().getFirstname()+" "+bachelorsThesis.getAssistant().getLastname()).setHeader("Assistent").setKey("assistant").setAutoWidth(true);
-        grid.addColumn("student").setAutoWidth(true);
-        grid.addColumn("deadline").setAutoWidth(true);
-        grid.addColumn("examDate").setAutoWidth(true);
-        grid.addComponentColumn(mastersThesisFinished -> createFinishedIcon(mastersThesisFinished.isFinished())).setHeader("Abg.");
-
-        grid.getColumnByKey("title").setHeader("Titel");
-        grid.getColumnByKey("student").setHeader("Student");
-        grid.getColumnByKey("deadline").setHeader("Deadline");
-        grid.getColumnByKey("examDate").setHeader("Prüfungstermin");
-
-        grid.setItems(query -> mastersThesisService.list(
-                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-                .stream());
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event ->
-        {
-            if (event.getValue() != null)
-            {
-                UI.getCurrent().navigate(String.format(MASTERSTHESIS_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
-            } else
-            {
-                clearForm();
-                UI.getCurrent().navigate(MasterarbeitenAssistentenView.class);
-            }
-        });
+        createGrid();
+        //Hook up buttons
+        reactToGridSelection();
         fillAssistantField();
+        configureBinder();
+        cancelButtonListener();
+        saveButtonListener();
+        deleteButtonListener();
+        editButtonListener();
+    }
 
-        // Configure Form
-        binder = new BeanValidationBinder<>(MastersThesis.class);
-
-        // Bind fields. This is where you'd define e.g. validation rules
-        binder.bindInstanceFields(this);
-
-        //Hook up Cancel Button
-        cancel.addClickListener(e ->
-        {
-            clearForm();
-            refreshGrid();
-        });
-
-        //Hook up Save Button
-        save.addClickListener(e ->
-        {
-            try
-            {
-                this.mastersThesis = new MastersThesis();
-                binder.writeBean(this.mastersThesis);
-
-                if (title.getValue().trim().equals(""))
-                {
-                    Notification.show("Bitte Titel eintragen.");
-                } else
-                {
-                    if (assistant.isEmpty())
-                    {
-                        Notification.show("Bitte Assistent eintragen.");
-                    } else
-                    {
-                        if (deadline.isEmpty())
-                        {
-                            Notification.show("Bitte Deadline eintragen.");
-                        }
-                    }
-                }
-                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
-                {
-                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
-                    {
-                        if (this.mastersThesis != null)
-                        {
-                            int exists = projectEntityService.exists(this.mastersThesis);
-                            if (exists == 0)
-                            {
-                                mastersTheses=mastersThesisService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
-                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
-                                {
-
-                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
-                                }
-                                else
-                                {
-                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
-                                }
-                                if (mastersTheses.size()<limit)
-                                {
-                                mastersThesisService.update(this.mastersThesis);
-                                clearForm();
-                                refreshGrid();
-                                Notification.show("Masterarbeit gespeichert.");
-                                }
-                                else
-                                {
-                                    Notification.show("Ihr Limit an Masterarbeiten ist bereits erreicht.");
-                                }
-                            } else
-                            {
-                                Notification.show("Titel existiert bereits.");
-                            }
-                        }
-                    }
-                } else
-                {
-                    Notification.show("Assistenten dürfen nur Masterarbeiten auf ihren eigenen Namen buchen.");
-                }
-                UI.getCurrent().navigate(MasterarbeitenAssistentenView.class);
-            } catch (ValidationException validationException)
-            {
-                Notification.show("Es ist leider etwas schief gegangen.");
-            }
-        });
-
-        //Hook up Delete Button
-        delete.addClickListener(e ->
-        {
-            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(this.mastersThesis.getAssistant()))
-            {
-                warning.open();
-            }
-            else
-                {
-                    Notification.show("Assistenten dürfen ihre eigenen Masterarbeiten löschen.");
-                }
-        });
-
+    private void editButtonListener()
+    {
         //Hook up Edit Button
         edit.addClickListener(e ->
         {
@@ -296,6 +183,161 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
         });
     }
 
+    private void deleteButtonListener()
+    {
+        //Hook up Delete Button
+        delete.addClickListener(e ->
+        {
+            if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(this.mastersThesis.getAssistant()))
+            {
+                warning.open();
+            }
+            else
+            {
+                Notification.show("Assistenten dürfen ihre eigenen Masterarbeiten löschen.");
+            }
+        });
+    }
+
+    private void saveButtonListener()
+    {
+        //Hook up Save Button
+        save.addClickListener(e ->
+        {
+            try
+            {
+                this.mastersThesis = new MastersThesis();
+                binder.writeBean(this.mastersThesis);
+
+                if (title.getValue().trim().equals(""))
+                {
+                    Notification.show("Bitte Titel eintragen.");
+                } else
+                {
+                    if (assistant.isEmpty())
+                    {
+                        Notification.show("Bitte Assistent eintragen.");
+                    } else
+                    {
+                        if (deadline.isEmpty())
+                        {
+                            Notification.show("Bitte Deadline eintragen.");
+                        }
+                    }
+                }
+                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN) || assistantService.get(authenticatedUser.get().get().getUsername()).equals(assistant.getValue()))
+                {
+                    if (!title.getValue().trim().equals("") && !assistant.isEmpty() && !deadline.isEmpty())
+                    {
+                        if (this.mastersThesis != null)
+                        {
+                            int exists = projectEntityService.exists(this.mastersThesis);
+                            if (exists == 0)
+                            {
+                                mastersTheses=mastersThesisService.searchForAssistant(assistantService.get(authenticatedUser.get().get().getUsername()));
+                                if (authenticatedUser.get().get().getRoles().contains(Role.ADMIN))
+                                {
+
+                                    limit=administratorService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
+                                }
+                                else
+                                {
+                                    limit=assistantService.get(authenticatedUser.get().get().getUsername()).getMaLimit();
+                                }
+                                if (mastersTheses.size()<limit)
+                                {
+                                    mastersThesisService.update(this.mastersThesis);
+                                    clearForm();
+                                    refreshGrid();
+                                    Notification.show("Masterarbeit gespeichert.");
+                                }
+                                else
+                                {
+                                    Notification.show("Ihr Limit an Masterarbeiten ist bereits erreicht.");
+                                }
+                            } else
+                            {
+                                Notification.show("Titel existiert bereits.");
+                            }
+                        }
+                    }
+                } else
+                {
+                    Notification.show("Assistenten dürfen nur Masterarbeiten auf ihren eigenen Namen buchen.");
+                }
+                UI.getCurrent().navigate(MasterarbeitenAssistentenView.class);
+            } catch (ValidationException validationException)
+            {
+                Notification.show("Es ist leider etwas schief gegangen.");
+            }
+        });
+    }
+
+    private void cancelButtonListener()
+    {
+        //Hook up Cancel Button
+        cancel.addClickListener(e ->
+        {
+            clearForm();
+            refreshGrid();
+        });
+    }
+
+    private void configureBinder()
+    {
+        // Configure Form
+        binder = new BeanValidationBinder<>(MastersThesis.class);
+        // Bind fields. This is where you'd define e.g. validation rules
+        binder.bindInstanceFields(this);
+    }
+
+    private void reactToGridSelection()
+    {
+        // when a row is selected or deselected, populate form
+        grid.asSingleSelect().addValueChangeListener(event ->
+        {
+            if (event.getValue() != null)
+            {
+                UI.getCurrent().navigate(String.format(MASTERSTHESIS_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+            } else
+            {
+                clearForm();
+                UI.getCurrent().navigate(MasterarbeitenAssistentenView.class);
+            }
+        });
+    }
+
+    private void createGrid()
+    {
+        // Configure Grid
+        grid.addColumn("title").setWidth("750px");
+        grid.addColumn(mastersThesis -> mastersThesis.getAssistant().getFirstname()+" "+mastersThesis.getAssistant().getLastname(), "assistant.firstname")
+                .setHeader("Assistent")
+                .setKey("assistant")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(mastersThesis -> fillStudentColumn(mastersThesis),"student.firstname")
+                .setHeader("Student")
+                .setKey("student")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn("deadline").setAutoWidth(true);
+        grid.addColumn("examDate").setAutoWidth(true);
+        grid.addComponentColumn(mastersThesisFinished -> createFinishedIcon(mastersThesisFinished.isFinished()))
+                .setHeader("Abg.")
+                .setKey("finished")
+                .setAutoWidth(true);
+
+        grid.getColumnByKey("title").setHeader("Titel");
+        grid.getColumnByKey("deadline").setHeader("Deadline");
+        grid.getColumnByKey("examDate").setHeader("Prüfungstermin");
+
+        grid.setItems(query -> mastersThesisService.list(
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream());
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+    }
+
     @Override
     public void beforeEnter(BeforeEnterEvent event)
     {
@@ -318,6 +360,17 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
         }
     }
 
+    private String fillStudentColumn(MastersThesis mastersThesis)
+    {
+
+        String student="";
+        if(mastersThesis.getStudent()!=null && !mastersThesis.getStudent().equals(""))
+        {
+            student = mastersThesis.getStudent().getFirstname() + " " + mastersThesis.getStudent().getLastname();
+        }
+        return student;
+    }
+
     private void createAssistantBox()
     {
         assistant.setAllowCustomValue(false);
@@ -325,6 +378,15 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
         List<Assistant> assistants = assistantService.getAll();
         assistant.setItems(assistants);
         assistant.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
+    }
+
+    private void createStudentBox()
+    {
+        student.setAllowCustomValue(false);
+        student.setPlaceholder("Student auswählen");
+        List<Student> students = studentService.getAll();
+        student.setItems(students);
+        student.setItemLabelGenerator(person -> person.getFirstname() + " " + person.getLastname());
     }
 
     private void createEditorLayout(SplitLayout splitLayout)
@@ -338,7 +400,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
         FormLayout formLayout = new FormLayout();
         title = new TextField("Titel");
         createAssistantBox();
-        student = new TextField("Student");
+        createStudentBox();
         deadline = new DatePicker("Deadline");
         examDate = new DatePicker("examDate");
         finished = new Checkbox("Abgeschlossen");

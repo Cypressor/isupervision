@@ -8,7 +8,10 @@
 
 package com.cypress.isupervision.data.service;
 
+import com.cypress.isupervision.data.entity.user.Assistant;
 import com.cypress.isupervision.data.entity.user.Student;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,8 @@ public class StudentService
     public Optional<Student> get(UUID id) {
         return repository.findById(id);
     }
+
+    public List<Student> getAll(){return repository.findAll();}
 
     public Student get(String username) { return repository.findByUsername(username); }
 

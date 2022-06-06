@@ -13,6 +13,7 @@ import com.cypress.isupervision.data.service.AssistantService;
 import com.cypress.isupervision.security.AuthenticatedUser;
 import com.cypress.isupervision.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -49,11 +50,13 @@ public class AccountAssistentenView extends VerticalLayout
 
     private void createLayout()
     {
+        H1 greeting = new H1("Hello" + " " + assistant.getFirstname() + " " + assistant.getLastname());
         VerticalLayout fieldLayout = new VerticalLayout();
-        fieldLayout.add(projLimit,baLimit,maLimit,saveButton);
+        fieldLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         projLimit.setValue(assistant.getProjLimit().toString());
         baLimit.setValue(assistant.getBaLimit().toString());
         maLimit.setValue(assistant.getMaLimit().toString());
+        fieldLayout.add(greeting,projLimit,baLimit,maLimit,saveButton);
         add(fieldLayout);
     }
 }
