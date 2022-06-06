@@ -322,8 +322,7 @@ public class MasterarbeitenAssistentenView extends Div implements BeforeEnterObs
                 .setHeader("Student")
                 .setKey("student")
                 .setAutoWidth(true)
-                .setSortable(true)
-                .setSortProperty("student.lastname");
+                .setSortable(true);
         grid.addColumn("deadline").setAutoWidth(true);
         grid.addColumn("examDate").setAutoWidth(true);
         grid.addComponentColumn(mastersThesisFinished -> createFinishedIcon(mastersThesisFinished.isFinished()))
