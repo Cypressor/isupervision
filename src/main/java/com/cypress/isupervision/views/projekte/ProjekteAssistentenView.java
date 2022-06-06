@@ -9,7 +9,6 @@
 package com.cypress.isupervision.views.projekte;
 
 import com.cypress.isupervision.data.AssistantComparator;
-import com.cypress.isupervision.data.ProjectEntityAssistantComparator;
 import com.cypress.isupervision.data.Role;
 import com.cypress.isupervision.data.StudentComparator;
 import com.cypress.isupervision.data.entity.project.Project;
