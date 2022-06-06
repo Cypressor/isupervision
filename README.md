@@ -114,6 +114,12 @@ I am totally aware that this shouldn't be the case in any proper application.
 - Have a title, student, assistant deadline and projectType.
 - Masterstheses additionally have an examDate.
 
+### Database
+- Database is created at application startup.
+- Test users and projects are created at startup.
+- Database is dropped at application shutdown.
+- There is no persistent data in the test version of this application.
+
 ***
 
 ## Comments:
